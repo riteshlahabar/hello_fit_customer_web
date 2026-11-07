@@ -1,0 +1,84 @@
+/* hellofit-booking-confirmation-success.html — the client's stylesheet, copied as-is and scoped to this route.
+ * Scoped because the demo pages define 15 different :root blocks and redefine
+ * shared class names per page. Do not unscope. */
+
+[data-hf-page="booking-confirmed"] {--orange:#E33E29;--taupe:#C1B19E;--ink:#161614;--ivory:#FFF6EC;--paper:#fffaf4;--muted:#77716a;--line:#e8ddd1;--soft:#f7eee4;--shadow:0 16px 45px rgba(22,22,20,.09)}
+[data-hf-page="booking-confirmed"] * {box-sizing:border-box}
+[data-hf-page="booking-confirmed"] {scroll-behavior:smooth}
+[data-hf-page="booking-confirmed"] {margin:0;background:var(--ivory);color:var(--ink);font:13px/1.65 Poppins,Arial,sans-serif}
+[data-hf-page="booking-confirmed"] a {color:inherit;text-decoration:none}
+[data-hf-page="booking-confirmed"] button {font:inherit;cursor:pointer}
+[data-hf-page="booking-confirmed"] .container {width:min(1100px,calc(100% - 40px));margin:auto}
+[data-hf-page="booking-confirmed"] .announcement {background:var(--ink);color:var(--ivory);text-align:center;padding:8px 12px;font-size:10px;letter-spacing:.12em}
+[data-hf-page="booking-confirmed"] .announcement b {color:#ff8b79}
+[data-hf-page="booking-confirmed"] header {background:rgba(255,246,236,.96);border-bottom:1px solid var(--line)}
+[data-hf-page="booking-confirmed"] .nav {height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+[data-hf-page="booking-confirmed"] .logo {display:flex;align-items:center}
+[data-hf-page="booking-confirmed"] .logo img {width:150px;max-height:58px;object-fit:contain}
+[data-hf-page="booking-confirmed"] .navlinks {display:flex;gap:28px;align-items:center;font-size:12px;font-weight:600}
+[data-hf-page="booking-confirmed"] .navlinks a:hover {color:var(--orange)}
+[data-hf-page="booking-confirmed"] .navcta, [data-hf-page="booking-confirmed"] .btn {display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:var(--orange);color:white;padding:13px 22px;font-weight:700;font-size:12px;transition:.2s}
+[data-hf-page="booking-confirmed"] .navcta:hover, [data-hf-page="booking-confirmed"] .btn:hover {transform:translateY(-2px);box-shadow:0 8px 20px #e33e2933}
+[data-hf-page="booking-confirmed"] .outline {background:transparent;color:var(--ink);border:1px solid var(--line)}
+[data-hf-page="booking-confirmed"] .hero {padding:55px 0 75px;background:radial-gradient(ellipse at 50% 0%,#f7d8c9 0,transparent 55%)}
+[data-hf-page="booking-confirmed"] .crumb {font-size:11px;color:var(--muted);margin-bottom:24px}
+[data-hf-page="booking-confirmed"] .crumb a {text-decoration:underline;text-underline-offset:3px}
+[data-hf-page="booking-confirmed"] .success-wrap {max-width:850px;margin:auto}
+[data-hf-page="booking-confirmed"] .success-card {background:white;border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);overflow:hidden}
+[data-hf-page="booking-confirmed"] .success-top {text-align:center;padding:42px 30px 32px;background:linear-gradient(180deg,#fffaf5,#fff)}
+[data-hf-page="booking-confirmed"] .checkmark {width:76px;height:76px;border-radius:50%;background:#e7f5e8;color:#238447;display:grid;place-items:center;margin:0 auto 18px;border:7px solid #f2faf1}
+[data-hf-page="booking-confirmed"] .checkmark svg {width:31px;height:31px}
+[data-hf-page="booking-confirmed"] .eyebrow {color:var(--orange);font-size:10px;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+[data-hf-page="booking-confirmed"] .success-top h1 {font:clamp(36px,5vw,54px)/1.05 Anton,sans-serif;text-transform:uppercase;letter-spacing:.015em;margin:10px 0 12px}
+[data-hf-page="booking-confirmed"] .success-top p {color:var(--muted);max-width:490px;margin:0 auto}
+[data-hf-page="booking-confirmed"] .ref-pill {display:inline-flex;gap:9px;align-items:center;margin-top:20px;background:var(--ivory);border:1px dashed #d9c8b6;border-radius:12px;padding:10px 15px;font-size:12px}
+[data-hf-page="booking-confirmed"] .ref-pill strong {font-size:13px;letter-spacing:.07em}
+[data-hf-page="booking-confirmed"] .ref-pill button {border:0;background:transparent;color:var(--orange);font-size:11px;font-weight:800}
+[data-hf-page="booking-confirmed"] .card-body {padding:0 34px 32px}
+[data-hf-page="booking-confirmed"] .notice {display:flex;gap:12px;align-items:flex-start;background:#f0f8ef;border:1px solid #d9ead6;border-radius:13px;padding:15px 17px;margin-bottom:24px;color:#285b34}
+[data-hf-page="booking-confirmed"] .notice .symbol {font-size:19px}
+[data-hf-page="booking-confirmed"] .notice strong {display:block;font-size:12px;margin-bottom:2px}
+[data-hf-page="booking-confirmed"] .notice p {margin:0;font-size:11px;color:#4c6e52}
+[data-hf-page="booking-confirmed"] .section-title {font-size:13px;font-weight:800;margin:24px 0 13px}
+[data-hf-page="booking-confirmed"] .details {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+[data-hf-page="booking-confirmed"] .detail {border:1px solid var(--line);border-radius:13px;padding:15px;background:#fffdfa;min-width:0}
+[data-hf-page="booking-confirmed"] .detail .label {font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+[data-hf-page="booking-confirmed"] .detail .value {font-size:13px;font-weight:700;overflow-wrap:anywhere}
+[data-hf-page="booking-confirmed"] .detail .sub {font-size:10px;color:var(--muted);margin-top:3px}
+[data-hf-page="booking-confirmed"] .trainer-row {display:flex;align-items:center;gap:14px}
+[data-hf-page="booking-confirmed"] .avatar {width:58px;height:58px;flex-shrink:0;border-radius:15px;background:linear-gradient(135deg,#f0c4af,#d6b5a0);display:grid;place-items:center;font-size:21px;font-weight:800;color:#783b2b}
+[data-hf-page="booking-confirmed"] .price-row {display:flex;justify-content:space-between;gap:15px;padding:9px 0;color:var(--muted);font-size:12px}
+[data-hf-page="booking-confirmed"] .price-row.total {border-top:1px solid var(--line);padding-top:14px;margin-top:6px;color:var(--ink);font-weight:800;font-size:15px}
+[data-hf-page="booking-confirmed"] .price-row .amount {color:var(--ink);font-weight:700}
+[data-hf-page="booking-confirmed"] .payment-badge {display:inline-flex;align-items:center;gap:6px;border-radius:99px;background:#f1eee8;padding:5px 9px;font-size:10px;font-weight:700}
+[data-hf-page="booking-confirmed"] .actions {display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+[data-hf-page="booking-confirmed"] .actions .btn {flex:1;min-width:180px}
+[data-hf-page="booking-confirmed"] .help {text-align:center;color:var(--muted);font-size:11px;margin:24px 0 0}
+[data-hf-page="booking-confirmed"] .help a {color:var(--orange);font-weight:700}
+[data-hf-page="booking-confirmed"] .next-steps {display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}
+[data-hf-page="booking-confirmed"] .step {background:#fffaf5;border:1px solid var(--line);border-radius:15px;padding:17px}
+[data-hf-page="booking-confirmed"] .step .n {width:27px;height:27px;background:var(--ink);color:white;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;margin-bottom:10px}
+[data-hf-page="booking-confirmed"] .step strong {display:block;font-size:12px;margin-bottom:4px}
+[data-hf-page="booking-confirmed"] .step p {margin:0;color:var(--muted);font-size:11px}
+[data-hf-page="booking-confirmed"] footer {border-top:1px solid var(--line);padding:24px 0;background:#fffaf4}
+[data-hf-page="booking-confirmed"] .foot {display:flex;align-items:center;justify-content:space-between;gap:18px;color:var(--muted);font-size:10px}
+[data-hf-page="booking-confirmed"] .foot strong {color:var(--ink)}
+[data-hf-page="booking-confirmed"] .toast {position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:white;border-radius:99px;padding:12px 18px;box-shadow:var(--shadow);transition:.25s;z-index:99}
+[data-hf-page="booking-confirmed"] .toast.show {opacity:1;transform:translate(-50%,0)}
+@media(max-width:650px) {
+[data-hf-page="booking-confirmed"] .container {width:calc(100% - 26px)}
+[data-hf-page="booking-confirmed"] .nav {height:65px}
+[data-hf-page="booking-confirmed"] .logo img {width:120px}
+[data-hf-page="booking-confirmed"] .navlinks {gap:13px;font-size:10px}
+[data-hf-page="booking-confirmed"] .navlinks a:nth-child(2) {display:none}
+[data-hf-page="booking-confirmed"] .navcta {padding:10px 13px;font-size:10px}
+[data-hf-page="booking-confirmed"] .hero {padding:28px 0 48px}
+[data-hf-page="booking-confirmed"] .success-top {padding:32px 17px 26px}
+[data-hf-page="booking-confirmed"] .card-body {padding:0 16px 22px}
+[data-hf-page="booking-confirmed"] .details {grid-template-columns:1fr}
+[data-hf-page="booking-confirmed"] .next-steps {grid-template-columns:1fr}
+[data-hf-page="booking-confirmed"] .actions .btn {min-width:100%}
+[data-hf-page="booking-confirmed"] .foot {align-items:flex-start;flex-direction:column}
+[data-hf-page="booking-confirmed"] .ref-pill {font-size:10px}
+[data-hf-page="booking-confirmed"] .success-top h1 {font-size:39px}
+}

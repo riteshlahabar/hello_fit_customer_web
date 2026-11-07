@@ -1,0 +1,106 @@
+/* hellofit-saved-trainers-favourites.html — the client's stylesheet, copied as-is and scoped to this route.
+ * Scoped because the demo pages define 15 different :root blocks and redefine
+ * shared class names per page. Do not unscope. */
+
+[data-hf-page="saved-trainers"] {--orange:#E33E29;--cream:#FFF6EC;--ink:#161614;--muted:#77746f;--line:#eee5dc;--white:#fff;--soft:#fff0e8;--shadow:0 14px 36px #3120140d}
+[data-hf-page="saved-trainers"] * {box-sizing:border-box}
+[data-hf-page="saved-trainers"] {margin:0;background:#fbf8f3;color:var(--ink);font-family:Poppins,Arial,sans-serif;font-size:14px}
+[data-hf-page="saved-trainers"] a {text-decoration:none;color:inherit}
+[data-hf-page="saved-trainers"] button, [data-hf-page="saved-trainers"] input, [data-hf-page="saved-trainers"] select {font:inherit}
+[data-hf-page="saved-trainers"] button {cursor:pointer}
+[data-hf-page="saved-trainers"] .topbar {height:76px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,5vw,72px);position:sticky;top:0;z-index:10}
+[data-hf-page="saved-trainers"] .brand {display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
+[data-hf-page="saved-trainers"] .brand img {width:46px;height:46px;object-fit:contain}
+[data-hf-page="saved-trainers"] .brand b {color:var(--orange)}
+[data-hf-page="saved-trainers"] .nav {display:flex;gap:27px;align-items:center;color:#4d4b47;font-weight:500}
+[data-hf-page="saved-trainers"] .nav a:hover {color:var(--orange)}
+[data-hf-page="saved-trainers"] .user {display:flex;gap:10px;align-items:center}
+[data-hf-page="saved-trainers"] .avatar {width:38px;height:38px;border-radius:50%;background:#f7d7c9;display:grid;place-items:center;color:#8e3526;font-weight:800}
+[data-hf-page="saved-trainers"] .wrap {max-width:1240px;margin:auto;padding:32px 24px 60px}
+[data-hf-page="saved-trainers"] .crumb {color:#89847e;font-size:12px;margin-bottom:20px}
+[data-hf-page="saved-trainers"] .crumb span {color:var(--orange)}
+[data-hf-page="saved-trainers"] .hero {display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}
+[data-hf-page="saved-trainers"] .eyebrow {color:var(--orange);font-weight:800;font-size:11px;letter-spacing:2px;text-transform:uppercase}
+[data-hf-page="saved-trainers"] .hero h1 {font-family:Anton,sans-serif;font-weight:400;font-size:clamp(35px,4vw,49px);line-height:1.08;margin:8px 0}
+[data-hf-page="saved-trainers"] .hero p {color:var(--muted);margin:0}
+[data-hf-page="saved-trainers"] .btn {border:0;border-radius:10px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
+[data-hf-page="saved-trainers"] .primary {background:var(--orange);color:white;box-shadow:0 6px 16px #e33e292b}
+[data-hf-page="saved-trainers"] .primary:hover {background:#c93220;transform:translateY(-1px)}
+[data-hf-page="saved-trainers"] .light {background:#fff;border:1px solid var(--line);color:var(--ink)}
+[data-hf-page="saved-trainers"] .light:hover {border-color:var(--orange);color:var(--orange)}
+[data-hf-page="saved-trainers"] .summary {background:#211f1c;color:white;border-radius:19px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;overflow:hidden;position:relative}
+[data-hf-page="saved-trainers"] .summary:after {content:"♡";position:absolute;right:19%;top:-40px;font-size:155px;color:#ffffff0b;font-weight:800}
+[data-hf-page="saved-trainers"] .summary .small {color:#d4c8bd;font-size:12px}
+[data-hf-page="saved-trainers"] .summary strong {display:block;font-size:28px;margin-top:4px}
+[data-hf-page="saved-trainers"] .summary .right {display:flex;gap:32px;z-index:1}
+[data-hf-page="saved-trainers"] .summary .stat label {color:#c4b9af;font-size:11px}
+[data-hf-page="saved-trainers"] .summary .stat strong {font-size:22px}
+[data-hf-page="saved-trainers"] .toolbar {display:flex;gap:12px;align-items:center;margin-bottom:20px}
+[data-hf-page="saved-trainers"] .search {position:relative;flex:1;min-width:180px}
+[data-hf-page="saved-trainers"] .search:before {content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:#888}
+[data-hf-page="saved-trainers"] .search input {width:100%;border:1px solid var(--line);background:white;border-radius:11px;padding:13px 14px 13px 40px;outline:none}
+[data-hf-page="saved-trainers"] .search input:focus {border-color:var(--orange)}
+[data-hf-page="saved-trainers"] select {border:1px solid var(--line);background:white;border-radius:11px;padding:13px 15px;outline:none;color:#4c4842}
+[data-hf-page="saved-trainers"] .tabs {display:flex;gap:8px;align-items:center;margin-bottom:18px}
+[data-hf-page="saved-trainers"] .tab {background:transparent;border:1px solid transparent;border-radius:9px;padding:10px 14px;color:#77716a;font-weight:700}
+[data-hf-page="saved-trainers"] .tab.active {background:var(--soft);border-color:#f9d5c8;color:var(--orange)}
+[data-hf-page="saved-trainers"] .grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+[data-hf-page="saved-trainers"] .trainer {background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column}
+[data-hf-page="saved-trainers"] .trainer:hover {transform:translateY(-3px);box-shadow:0 18px 38px #31201415}
+[data-hf-page="saved-trainers"] .photo {height:180px;position:relative;display:flex;align-items:end;padding:17px;background:linear-gradient(135deg,#f8ded0,#edbca8 60%,#df8e74);overflow:hidden}
+[data-hf-page="saved-trainers"] .photo:before {content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:#fff5e9;right:25px;top:17px}
+[data-hf-page="saved-trainers"] .photo:after {content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:#d78b70;right:50px;top:40px;opacity:.45}
+[data-hf-page="saved-trainers"] .portrait {position:relative;z-index:1;width:92px;height:92px;border-radius:50%;border:4px solid #fff9f2;background:#f8f0e8;display:grid;place-items:center;font-size:42px;box-shadow:0 8px 18px #5c2c1b22}
+[data-hf-page="saved-trainers"] .heart {position:absolute;right:14px;top:14px;z-index:2;width:40px;height:40px;border:0;border-radius:50%;background:#ffffffed;color:#71665e;font-size:21px;display:grid;place-items:center;box-shadow:0 3px 10px #0000000d}
+[data-hf-page="saved-trainers"] .heart.saved {color:var(--orange);background:#fff}
+[data-hf-page="saved-trainers"] .online {position:absolute;left:14px;top:15px;z-index:2;background:#fff;border-radius:99px;padding:6px 9px;font-size:10px;font-weight:800;color:#39815a}
+[data-hf-page="saved-trainers"] .body {padding:18px;display:flex;flex-direction:column;flex:1}
+[data-hf-page="saved-trainers"] .row {display:flex;justify-content:space-between;align-items:center;gap:8px}
+[data-hf-page="saved-trainers"] .name {font-size:18px;font-weight:800;margin:0}
+[data-hf-page="saved-trainers"] .verified {font-size:11px;color:#34865b;font-weight:700}
+[data-hf-page="saved-trainers"] .meta {color:var(--muted);font-size:12px;margin-top:5px}
+[data-hf-page="saved-trainers"] .rating {font-size:12px;font-weight:700;margin:11px 0}
+[data-hf-page="saved-trainers"] .rating span {color:#e7a42d}
+[data-hf-page="saved-trainers"] .tags {display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+[data-hf-page="saved-trainers"] .tag {background:#f7f3ed;color:#655f58;padding:6px 9px;border-radius:7px;font-size:10px;font-weight:600}
+[data-hf-page="saved-trainers"] .bottom {border-top:1px solid #f1eae3;padding-top:14px;margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+[data-hf-page="saved-trainers"] .price {font-weight:800;font-size:18px}
+[data-hf-page="saved-trainers"] .price small {font-size:10px;font-weight:500;color:#8d867e}
+[data-hf-page="saved-trainers"] .card-actions {display:flex;gap:7px}
+[data-hf-page="saved-trainers"] .card-actions .btn {padding:9px 12px;font-size:11px}
+[data-hf-page="saved-trainers"] .empty {display:none;background:white;border:1px dashed #e1d3c5;border-radius:18px;padding:52px 20px;text-align:center;grid-column:1/-1}
+[data-hf-page="saved-trainers"] .empty .big {font-size:42px}
+[data-hf-page="saved-trainers"] .empty h3 {margin:10px 0 5px}
+[data-hf-page="saved-trainers"] .empty p {color:var(--muted)}
+[data-hf-page="saved-trainers"] .hint {font-size:11px;color:#938c84;text-align:center;margin-top:25px}
+[data-hf-page="saved-trainers"] .toast {position:fixed;bottom:22px;right:22px;background:#161614;color:#fff;padding:14px 18px;border-radius:12px;box-shadow:0 10px 30px #0002;z-index:50;transform:translateY(120px);opacity:0;transition:.25s}
+[data-hf-page="saved-trainers"] .toast.show {transform:translateY(0);opacity:1}
+[data-hf-page="saved-trainers"] .modalbg {position:fixed;inset:0;background:#17130f85;z-index:30;display:none;align-items:center;justify-content:center;padding:20px}
+[data-hf-page="saved-trainers"] .modalbg.show {display:flex}
+[data-hf-page="saved-trainers"] .modal {width:min(480px,100%);background:white;border-radius:20px;padding:25px}
+[data-hf-page="saved-trainers"] .modal h2 {margin:0 0 8px}
+[data-hf-page="saved-trainers"] .modal p {color:var(--muted);line-height:1.6}
+[data-hf-page="saved-trainers"] .actions {display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+[data-hf-page="saved-trainers"] .mobile {display:none}
+@media(max-width:950px) {
+[data-hf-page="saved-trainers"] .grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+[data-hf-page="saved-trainers"] .nav {gap:15px}
+[data-hf-page="saved-trainers"] .summary .right {gap:18px}
+}
+@media(max-width:720px) {
+[data-hf-page="saved-trainers"] .nav {display:none}
+[data-hf-page="saved-trainers"] .mobile {display:block}
+[data-hf-page="saved-trainers"] .wrap {padding:24px 15px 45px}
+[data-hf-page="saved-trainers"] .hero {align-items:flex-start;flex-direction:column}
+[data-hf-page="saved-trainers"] .summary {align-items:flex-start;flex-direction:column}
+[data-hf-page="saved-trainers"] .summary .right {width:100%;justify-content:space-between}
+[data-hf-page="saved-trainers"] .toolbar {flex-wrap:wrap}
+[data-hf-page="saved-trainers"] .search {flex-basis:100%}
+[data-hf-page="saved-trainers"] .toolbar select {flex:1;min-width:125px}
+[data-hf-page="saved-trainers"] .grid {grid-template-columns:1fr}
+[data-hf-page="saved-trainers"] .photo {height:165px}
+[data-hf-page="saved-trainers"] .tabs {overflow:auto}
+[data-hf-page="saved-trainers"] .tab {white-space:nowrap}
+[data-hf-page="saved-trainers"] .brand {font-size:19px}
+[data-hf-page="saved-trainers"] .brand img {width:38px;height:38px}
+}

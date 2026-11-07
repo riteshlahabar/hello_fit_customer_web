@@ -1,0 +1,92 @@
+/* hellofit-customer-login-registration.html — the client's stylesheet, copied as-is and scoped to this route.
+ * Scoped because the demo pages define 15 different :root blocks and redefine
+ * shared class names per page. Do not unscope. */
+
+[data-hf-page="login"] {--orange:#E33E29;--taupe:#C1B19E;--ink:#161614;--ivory:#FFF6EC;--paper:#fffaf4;--muted:#77716a;--line:#e8ddd1;--soft:#f7eee4;--shadow:0 18px 55px #16161413}
+[data-hf-page="login"] * {box-sizing:border-box}
+[data-hf-page="login"] {margin:0;background:var(--ivory);color:var(--ink);font:13px/1.65 Poppins,Arial,sans-serif}
+[data-hf-page="login"] a {color:inherit;text-decoration:none}
+[data-hf-page="login"] button, [data-hf-page="login"] input {font:inherit}
+[data-hf-page="login"] button {cursor:pointer}
+[data-hf-page="login"] .top {height:78px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(5vw,22px)}
+[data-hf-page="login"] .brand {display:flex;align-items:center;gap:10px}
+[data-hf-page="login"] .brand img {width:45px;height:45px;object-fit:contain;border-radius:50%;background:var(--orange)}
+[data-hf-page="login"] .brand strong {font:400 28px Anton,sans-serif;letter-spacing:.02em}
+[data-hf-page="login"] .brand small {display:block;color:var(--muted);font-size:9px;letter-spacing:.1em;line-height:1.2}
+[data-hf-page="login"] .top a.back {font-size:11px;font-weight:600}
+[data-hf-page="login"] .top a.back:hover {color:var(--orange)}
+[data-hf-page="login"] .layout {min-height:calc(100vh - 78px);display:grid;grid-template-columns:1fr 1fr;max-width:1320px;margin:auto;padding:34px 5vw;gap:5vw;align-items:center}
+[data-hf-page="login"] .story {position:relative;min-height:590px;border-radius:26px;overflow:hidden;background:var(--ink);color:white;padding:clamp(28px,4vw,58px);display:flex;flex-direction:column;justify-content:space-between}
+[data-hf-page="login"] .story:before {content:"";position:absolute;width:420px;height:420px;border-radius:50%;border:1px solid #ffffff20;right:-130px;top:-95px;box-shadow:0 0 0 40px #ffffff08,0 0 0 80px #ffffff05}
+[data-hf-page="login"] .eyebrow {font-size:10px;text-transform:uppercase;letter-spacing:.19em;color:#ff9b8d;font-weight:700;position:relative}
+[data-hf-page="login"] .story h1 {font:400 clamp(48px,6vw,82px)/.98 Anton,sans-serif;text-transform:uppercase;max-width:520px;position:relative;margin:22px 0}
+[data-hf-page="login"] .story h1 em {font-style:normal;color:var(--orange)}
+[data-hf-page="login"] .story p {color:#d0c9c0;max-width:370px;font-size:13px;position:relative}
+[data-hf-page="login"] .perks {display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative;margin-top:40px}
+[data-hf-page="login"] .perk {border:1px solid #ffffff20;border-radius:14px;padding:14px}
+[data-hf-page="login"] .perk b {display:block;font-size:12px}
+[data-hf-page="login"] .perk span {font-size:10px;color:#bcb5ad}
+[data-hf-page="login"] .quote {border-top:1px solid #ffffff20;padding-top:20px;color:#d0c9c0;font-size:11px;position:relative}
+[data-hf-page="login"] .quote b {display:block;color:white;margin-top:7px}
+[data-hf-page="login"] .auth-wrap {width:100%;max-width:490px;margin:auto;padding:12px 0}
+[data-hf-page="login"] .auth-head .eyebrow {color:var(--orange)}
+[data-hf-page="login"] .auth-head h2 {font:400 clamp(34px,4vw,48px)/1.08 Anton,sans-serif;margin:9px 0 8px;text-transform:uppercase}
+[data-hf-page="login"] .auth-head p {color:var(--muted);margin:0 0 24px;font-size:12px}
+[data-hf-page="login"] .tabs {display:grid;grid-template-columns:1fr 1fr;background:#f0e5d9;border-radius:12px;padding:5px;margin-bottom:22px}
+[data-hf-page="login"] .tab {border:0;background:transparent;border-radius:9px;padding:11px;font-size:12px;font-weight:700;color:var(--muted)}
+[data-hf-page="login"] .tab.active {background:white;color:var(--ink);box-shadow:0 3px 12px #1616140c}
+[data-hf-page="login"] .social {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+[data-hf-page="login"] .social button {background:#fffdf9;border:1px solid var(--line);border-radius:10px;padding:11px 8px;font-size:11px;font-weight:600}
+[data-hf-page="login"] .social button:hover {border-color:var(--orange)}
+[data-hf-page="login"] .google-g {font-weight:800;color:#4285f4;margin-right:7px;font-size:14px}
+[data-hf-page="login"] .divider {display:flex;align-items:center;gap:12px;color:#a19a91;font-size:10px;margin:19px 0}
+[data-hf-page="login"] .divider:before, [data-hf-page="login"] .divider:after {content:"";height:1px;background:var(--line);flex:1}
+[data-hf-page="login"] .field {margin-bottom:14px}
+[data-hf-page="login"] .field label {display:block;font-size:11px;font-weight:700;margin-bottom:6px}
+[data-hf-page="login"] .field input {width:100%;border:1px solid #e3d8cb;background:#fffdf9;border-radius:10px;padding:13px 14px;outline:none;color:var(--ink);font-size:12px;transition:.2s}
+[data-hf-page="login"] .field input:focus {border-color:var(--orange);box-shadow:0 0 0 3px #e33e2915}
+[data-hf-page="login"] .field input::placeholder {color:#aaa197}
+[data-hf-page="login"] .input-wrap {position:relative}
+[data-hf-page="login"] .input-wrap input {padding-right:70px}
+[data-hf-page="login"] .show-pass {position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);font-size:10px;font-weight:700}
+[data-hf-page="login"] .rowline {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:3px 0 18px;font-size:10px;color:var(--muted)}
+[data-hf-page="login"] .check {display:flex;align-items:flex-start;gap:7px}
+[data-hf-page="login"] .check input {accent-color:var(--orange);margin-top:3px}
+[data-hf-page="login"] .text-link {color:var(--orange);font-weight:700}
+[data-hf-page="login"] .submit {width:100%;border:0;border-radius:999px;background:var(--orange);color:white;font-weight:800;font-size:12px;padding:15px;box-shadow:0 9px 20px #e33e2922;transition:.2s}
+[data-hf-page="login"] .submit:hover {transform:translateY(-2px);background:#cb301e}
+[data-hf-page="login"] .legal {text-align:center;color:#999188;font-size:9px;margin:14px 0 0}
+[data-hf-page="login"] .message {display:none;border-radius:10px;padding:11px 13px;margin:0 0 14px;font-size:11px}
+[data-hf-page="login"] .message.show {display:block}
+[data-hf-page="login"] .message.error {background:#fff0ee;color:#a72a1b;border:1px solid #f4c4bd}
+[data-hf-page="login"] .message.success {background:#edf8ee;color:#236b37;border:1px solid #cce8d1}
+[data-hf-page="login"] .otp-note {display:none;color:var(--muted);font-size:10px;margin:-4px 0 12px}
+[data-hf-page="login"] .otp-note.show {display:block}
+[data-hf-page="login"] .form-view[hidden] {display:none}
+[data-hf-page="login"] .footer-note {text-align:center;color:var(--muted);font-size:10px;margin-top:19px}
+[data-hf-page="login"] .footer-note a {font-weight:700;color:var(--orange)}
+@media(max-width:900px) {
+[data-hf-page="login"] .layout {grid-template-columns:1fr;max-width:650px;padding:24px}
+[data-hf-page="login"] .story {min-height:330px;gap:25px}
+[data-hf-page="login"] .story h1 {font-size:58px}
+[data-hf-page="login"] .quote {display:none}
+[data-hf-page="login"] .auth-wrap {max-width:520px}
+[data-hf-page="login"] .perks {margin-top:20px}
+}
+@media(max-width:520px) {
+[data-hf-page="login"] .top {height:68px;padding:0 18px}
+[data-hf-page="login"] .brand img {width:39px;height:39px}
+[data-hf-page="login"] .brand strong {font-size:24px}
+[data-hf-page="login"] .layout {padding:18px 18px 30px;gap:24px}
+[data-hf-page="login"] .story {min-height:280px;padding:25px 23px;border-radius:19px}
+[data-hf-page="login"] .story h1 {font-size:48px;margin:15px 0}
+[data-hf-page="login"] .story p {font-size:11px}
+[data-hf-page="login"] .perks {gap:8px}
+[data-hf-page="login"] .perk {padding:10px}
+[data-hf-page="login"] .perk b {font-size:10px}
+[data-hf-page="login"] .perk span {font-size:9px}
+[data-hf-page="login"] .auth-head h2 {font-size:38px}
+[data-hf-page="login"] .social {gap:8px}
+[data-hf-page="login"] .social button {font-size:10px}
+[data-hf-page="login"] .rowline {align-items:flex-start}
+}

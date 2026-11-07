@@ -1,0 +1,107 @@
+/* hellofit-help-support.html — the client's stylesheet, copied as-is and scoped to this route.
+ * Scoped because the demo pages define 15 different :root blocks and redefine
+ * shared class names per page. Do not unscope. */
+
+[data-hf-page="help"] {--orange:#E33E29;--cream:#FFF6EC;--ink:#161614;--muted:#77746f;--line:#eee5dc;--soft:#fff0e8;--shadow:0 14px 36px #3120140d}
+[data-hf-page="help"] * {box-sizing:border-box}
+[data-hf-page="help"] {margin:0;background:#fbf8f3;color:var(--ink);font-family:Poppins,Arial,sans-serif;font-size:14px}
+[data-hf-page="help"] a {color:inherit;text-decoration:none}
+[data-hf-page="help"] button, [data-hf-page="help"] input, [data-hf-page="help"] select, [data-hf-page="help"] textarea {font:inherit}
+[data-hf-page="help"] button {cursor:pointer}
+[data-hf-page="help"] .topbar {height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,5vw,72px);position:sticky;top:0;z-index:10}
+[data-hf-page="help"] .brand {display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
+[data-hf-page="help"] .brand img {width:46px;height:46px;object-fit:contain}
+[data-hf-page="help"] .brand b {color:var(--orange)}
+[data-hf-page="help"] .nav {display:flex;gap:24px;align-items:center;color:#4d4b47;font-weight:500}
+[data-hf-page="help"] .nav a:hover {color:var(--orange)}
+[data-hf-page="help"] .user {display:flex;gap:10px;align-items:center}
+[data-hf-page="help"] .avatar {width:38px;height:38px;border-radius:50%;background:#f7d7c9;display:grid;place-items:center;color:#8e3526;font-weight:800}
+[data-hf-page="help"] .wrap {max-width:1200px;margin:auto;padding:30px 24px 60px}
+[data-hf-page="help"] .crumb {color:#89847e;font-size:12px;margin-bottom:20px}
+[data-hf-page="help"] .crumb span {color:var(--orange)}
+[data-hf-page="help"] .hero {background:#211f1c;color:white;border-radius:22px;padding:clamp(28px,5vw,52px);display:grid;grid-template-columns:1.3fr .7fr;gap:24px;align-items:center;position:relative;overflow:hidden;margin-bottom:24px}
+[data-hf-page="help"] .hero:after {content:"?";font-family:Anton,sans-serif;position:absolute;right:8%;top:-65px;font-size:300px;color:#ffffff09;pointer-events:none}
+[data-hf-page="help"] .eyebrow {color:#ff927e;font-weight:800;font-size:11px;letter-spacing:2px;text-transform:uppercase}
+[data-hf-page="help"] .hero h1 {font-family:Anton,sans-serif;font-weight:400;font-size:clamp(38px,5vw,59px);line-height:1.02;margin:10px 0 14px;position:relative;z-index:1}
+[data-hf-page="help"] .hero p {color:#d3c9bf;line-height:1.8;max-width:580px;margin:0 0 23px;position:relative;z-index:1}
+[data-hf-page="help"] .search {position:relative;max-width:550px;z-index:2}
+[data-hf-page="help"] .search input {width:100%;border:1px solid #ffffff33;background:#ffffff12;border-radius:12px;padding:15px 48px 15px 16px;color:white;outline:none}
+[data-hf-page="help"] .search input::placeholder {color:#c9bdb2}
+[data-hf-page="help"] .search button {position:absolute;right:6px;top:6px;width:37px;height:37px;border:0;border-radius:9px;background:var(--orange);color:white;font-size:18px}
+[data-hf-page="help"] .heroart {min-height:200px;display:grid;place-items:center;position:relative;z-index:1}
+[data-hf-page="help"] .helpbubble {width:190px;height:160px;background:var(--orange);border-radius:35px 35px 35px 8px;display:grid;place-items:center;font-size:90px;box-shadow:0 20px 50px #0003;transform:rotate(5deg)}
+[data-hf-page="help"] .helpbubble span {transform:rotate(-5deg)}
+[data-hf-page="help"] .quick {display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:27px}
+[data-hf-page="help"] .quickcard {background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);transition:.2s}
+[data-hf-page="help"] .quickcard:hover {border-color:#f0b6a7;transform:translateY(-2px)}
+[data-hf-page="help"] .quickicon {width:43px;height:43px;border-radius:13px;background:var(--soft);display:grid;place-items:center;font-size:21px;margin-bottom:15px}
+[data-hf-page="help"] .quickcard h3 {font-size:14px;margin:0 0 7px}
+[data-hf-page="help"] .quickcard p {color:var(--muted);font-size:11px;line-height:1.65;margin:0 0 14px}
+[data-hf-page="help"] .textlink {color:var(--orange);font-size:11px;font-weight:800}
+[data-hf-page="help"] .sectiontitle {display:flex;align-items:end;justify-content:space-between;gap:16px;margin:30px 0 16px}
+[data-hf-page="help"] .sectiontitle h2 {font-size:22px;margin:0}
+[data-hf-page="help"] .sectiontitle p {color:var(--muted);font-size:12px;margin:5px 0 0}
+[data-hf-page="help"] .faqgrid {display:grid;grid-template-columns:1fr 1fr;gap:18px}
+[data-hf-page="help"] .faqgroup {background:white;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+[data-hf-page="help"] .faqgroup h3 {font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:9px}
+[data-hf-page="help"] .faqicon {width:32px;height:32px;background:var(--soft);color:var(--orange);border-radius:9px;display:grid;place-items:center}
+[data-hf-page="help"] .faq {border-bottom:1px solid #f0e9e2}
+[data-hf-page="help"] .faq:last-child {border-bottom:0}
+[data-hf-page="help"] .faq button {border:0;background:transparent;width:100%;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:15px 0;text-align:left;font-size:12px;font-weight:700;color:#393530}
+[data-hf-page="help"] .faq button span:last-child {font-size:19px;color:var(--orange);transition:.2s}
+[data-hf-page="help"] .faq .answer {display:none;color:#716a63;font-size:12px;line-height:1.75;padding:0 22px 15px 0}
+[data-hf-page="help"] .faq.open .answer {display:block}
+[data-hf-page="help"] .faq.open button span:last-child {transform:rotate(45deg)}
+[data-hf-page="help"] .contactgrid {display:grid;grid-template-columns:.9fr 1.1fr;gap:18px}
+[data-hf-page="help"] .contactinfo {background:#fff;border:1px solid var(--line);border-radius:17px;padding:23px;box-shadow:var(--shadow)}
+[data-hf-page="help"] .contactinfo h3 {font-size:19px;margin:0 0 8px}
+[data-hf-page="help"] .contactinfo>p {font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 19px}
+[data-hf-page="help"] .contactitem {display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #f2ebe4}
+[data-hf-page="help"] .contactitem .ci {width:37px;height:37px;display:grid;place-items:center;border-radius:11px;background:var(--soft);font-size:17px;flex-shrink:0}
+[data-hf-page="help"] .contactitem strong {display:block;font-size:12px;margin-bottom:4px}
+[data-hf-page="help"] .contactitem small {display:block;color:#8b847c;font-size:11px;line-height:1.6}
+[data-hf-page="help"] .contactform {background:white;border:1px solid var(--line);border-radius:17px;padding:23px;box-shadow:var(--shadow)}
+[data-hf-page="help"] .contactform h3 {font-size:19px;margin:0 0 6px}
+[data-hf-page="help"] .contactform>p {font-size:12px;color:var(--muted);margin:0 0 18px}
+[data-hf-page="help"] .formgrid {display:grid;grid-template-columns:1fr 1fr;gap:12px}
+[data-hf-page="help"] .field {display:grid;gap:6px}
+[data-hf-page="help"] .field.full {grid-column:1/-1}
+[data-hf-page="help"] .field label {font-size:11px;font-weight:700;color:#5f5952}
+[data-hf-page="help"] .field input, [data-hf-page="help"] .field select, [data-hf-page="help"] .field textarea {border:1px solid var(--line);background:#fffaf6;border-radius:9px;padding:12px;outline:none;width:100%;color:var(--ink)}
+[data-hf-page="help"] .field input:focus, [data-hf-page="help"] .field select:focus, [data-hf-page="help"] .field textarea:focus {border-color:var(--orange)}
+[data-hf-page="help"] .field textarea {resize:vertical;min-height:100px}
+[data-hf-page="help"] .submitrow {display:flex;align-items:center;justify-content:space-between;gap:10px;grid-column:1/-1}
+[data-hf-page="help"] .submitrow small {font-size:10px;color:#908982}
+[data-hf-page="help"] .btn {border:0;border-radius:10px;padding:12px 16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
+[data-hf-page="help"] .primary {background:var(--orange);color:white;box-shadow:0 6px 16px #e33e292b}
+[data-hf-page="help"] .primary:hover {background:#c93220;transform:translateY(-1px)}
+[data-hf-page="help"] .light {background:white;border:1px solid var(--line);color:var(--ink)}
+[data-hf-page="help"] .status {background:#eaf6ed;color:#2b784b;border-radius:99px;padding:6px 9px;font-size:10px;font-weight:800}
+[data-hf-page="help"] .bottomcta {background:var(--soft);border:1px solid #f7d5c9;border-radius:18px;padding:22px 25px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+[data-hf-page="help"] .bottomcta h3 {margin:0 0 5px;font-size:17px}
+[data-hf-page="help"] .bottomcta p {margin:0;color:#746b62;font-size:12px;line-height:1.6}
+[data-hf-page="help"] .toast {position:fixed;bottom:22px;right:22px;background:#161614;color:white;padding:14px 18px;border-radius:12px;box-shadow:0 10px 30px #0002;z-index:50;transform:translateY(120px);opacity:0;transition:.25s}
+[data-hf-page="help"] .toast.show {transform:translateY(0);opacity:1}
+[data-hf-page="help"] .mobile {display:none}
+@media(max-width:850px) {
+[data-hf-page="help"] .nav {gap:12px}
+[data-hf-page="help"] .quick {grid-template-columns:repeat(2,1fr)}
+[data-hf-page="help"] .hero {grid-template-columns:1fr}
+[data-hf-page="help"] .heroart {display:none}
+[data-hf-page="help"] .faqgrid {grid-template-columns:1fr}
+[data-hf-page="help"] .contactgrid {grid-template-columns:1fr}
+}
+@media(max-width:650px) {
+[data-hf-page="help"] .nav {display:none}
+[data-hf-page="help"] .mobile {display:block}
+[data-hf-page="help"] .wrap {padding:22px 14px 45px}
+[data-hf-page="help"] .brand {font-size:19px}
+[data-hf-page="help"] .brand img {width:38px;height:38px}
+[data-hf-page="help"] .quick {gap:10px}
+[data-hf-page="help"] .quickcard {padding:15px}
+[data-hf-page="help"] .formgrid {grid-template-columns:1fr}
+[data-hf-page="help"] .field.full, [data-hf-page="help"] .submitrow {grid-column:auto}
+[data-hf-page="help"] .submitrow {align-items:flex-start;flex-direction:column}
+[data-hf-page="help"] .bottomcta {align-items:flex-start;flex-direction:column}
+[data-hf-page="help"] .sectiontitle {align-items:flex-start;flex-direction:column}
+}

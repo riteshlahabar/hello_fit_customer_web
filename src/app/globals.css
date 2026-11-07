@@ -1,26 +1,78 @@
-@import "tailwindcss";
+/* Global reset only.
+ *
+ * Every page's real styling lives beside its route, scoped to [data-hf-page="<slug>"],
+ * because the client's demo pages define 15 different :root blocks and redefine shared
+ * class names (.btn, .brand, .card, .topbar) differently per page. Unscoped they overwrite
+ * each other.
+ *
+ * The attribute is `data-hf-page`, not `data-page`: the demo's own dashboard sidebar uses
+ * `data-page="overview"` etc. on its nav buttons, and a bare [data-page] selector here
+ * matched those too — it made every nav button 100vh tall. Don't rename it back.
+ *
+ * Keep this file tiny: only rules that must apply outside any page scope belong here.
+ * Fonts (Anton, Poppins) are loaded in layout.tsx.
+ */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  /* Neutral ground behind the page; each route paints its own via [data-hf-page]. */
+  background: #fff6ec;
+  color: #161614;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Each route's wrapper must fill the viewport so its own background reaches the edges —
+   the demo set that on <body>, which is now outside the scope. */
+[data-hf-page] {
+  min-height: 100vh;
+}
+
+/* The toast is rendered by ToastProvider at the root, outside every page scope. */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  background: #161614;
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 12px;
+  box-shadow: 0 18px 48px rgba(22, 22, 20, 0.1);
+  transition: 0.25s;
+  z-index: 100;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
 }

@@ -1,20 +1,47 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { Confirmed } from './Confirmed';
 import './page.css';
 
 /**
- * Converted from the demo's hellofit-booking-confirmation-success.html.
+ * Converted from the demo's hellofit-booking-confirmed.html.
  * The markup and styling are the client's design; only the mechanics are React.
+ *
+ * Reached as `/booking-confirmed?booking=<id>` from checkout. The card reads
+ * the booking back from the server, so the reference, the status and the
+ * amounts are the recorded ones (PDF §5.7, §5.8).
  */
 
 export const metadata: Metadata = {
-  title: "Booking Confirmed | HelloFit",
+  title: "HelloFit | Booking Confirmed",
 };
 
 export default function BookingConfirmedPage() {
   return (
     <div data-hf-page="booking-confirmed">
-      <div className="announcement">YOUR FITNESS JOURNEY, MADE PERSONAL <b>• HELLOFIT</b></div><header><div className="container nav"><Link className="logo" href="/" aria-label="HelloFit home"><img src="/hellofit-logo.png" alt="HelloFit logo" /></Link><nav className="navlinks"><Link href="/">Home</Link><Link href="/find-a-trainer">Find a Trainer</Link><Link href="/trainer-profile">Trainer Profile</Link></nav><Link className="navcta" href="/find-a-trainer">Explore Trainers ↗</Link></div></header><main className="hero"><div className="container"><div className="crumb"><Link href="/">Home</Link>  /  Booking confirmation</div><div className="success-wrap"><section className="success-card"><div className="success-top"><div className="checkmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4 4L19 6"></path></svg></div><div className="eyebrow">You&apos;re one step closer</div><h1>Booking confirmed!</h1><p>Your session is in the calendar. We’ve put the important details together below so you can get ready with confidence.</p><div className="ref-pill"><span>BOOKING ID</span><strong id="bookingId">HF-261103-4827</strong><button type="button" id="copyId">COPY ID</button></div></div><div className="card-body"><div className="notice"><div className="symbol">✓</div><div><strong>Payment successful · Booking confirmed</strong><p>This is a demonstration confirmation for the HelloFit prototype. No real booking or payment has been made.</p></div></div><div className="section-title">Your session</div><div className="details"><div className="detail"><div className="label">Trainer</div><div className="trainer-row"><div className="avatar">SP</div><div><div className="value">Sneha Patil</div><div className="sub">Yoga & flexibility coach · ★ 4.9</div></div></div></div><div className="detail"><div className="label">Service booked</div><div className="value">Personal Yoga Session</div><div className="sub">60 minutes · 1:1 session</div></div><div className="detail"><div className="label">Date & time</div><div className="value">Tuesday, 3 November 2026</div><div className="sub">10:00 AM – 11:00 AM IST</div></div><div className="detail"><div className="label">Session location</div><div className="value">At your home</div><div className="sub">Pune, Maharashtra · Sample location</div></div></div><div className="section-title">Payment summary</div><div className="detail"><div className="price-row"><span>Personal Yoga Session</span><span className="amount">₹600.00</span></div><div className="price-row"><span>Booking fee</span><span className="amount">₹0.00</span></div><div className="price-row"><span>Discount <span style={{ color: "var(--orange)" }}>(HELLO10)</span></span><span className="amount">−₹60.00</span></div><div className="price-row total"><span>Total paid</span><span>₹540.00</span></div><div style={{ marginTop: "8px" }}><span className="payment-badge">✓ Paid via UPI · Demo</span></div></div><div className="actions"><button className="btn" id="calendarBtn" type="button">＋ Add to calendar</button><button className="btn outline" id="printBtn" type="button">Print confirmation ↗</button><Link className="btn outline" href="/">Back to home</Link></div><p className="help">Need help with your session? <a href="mailto:support@hellofit.example">Contact HelloFit support</a></p></div></section><div className="next-steps"><div className="step"><div className="n">01</div><strong>Check your details</strong><p>Keep your booking ID handy in case you need help with this session.</p></div><div className="step"><div className="n">02</div><strong>Get session-ready</strong><p>Wear comfortable clothing and keep a mat and water bottle nearby.</p></div><div className="step"><div className="n">03</div><strong>Stay in the loop</strong><p>In a live service, session reminders and updates would be sent to your registered contact.</p></div></div></div></div></main><footer><div className="container foot"><strong>HELLOFIT · Move better. Feel stronger.</strong><span>© 2026 HelloFit · Customer booking prototype</span><span><Link href="/find-a-trainer">Find a trainer</Link>  ·  <Link href="/">Home</Link></span></div></footer><div className="toast" id="toast" role="status" aria-live="polite">Copied!</div>
+      <div className="announcement">YOUR FITNESS JOURNEY, MADE PERSONAL <b>• HELLOFIT</b></div>
+      <header><div className="container nav"><Link className="logo" href="/" aria-label="HelloFit home"><img src="/hellofit-logo.png" alt="HelloFit logo" /></Link><nav className="navlinks"><Link href="/">Home</Link><Link href="/my-bookings">My Bookings</Link><Link href="/profile">My Profile</Link></nav><Link className="navcta" href="/booking">Book again ↗</Link></div></header>
+
+      <main className="hero">
+        <div className="container">
+          <div className="crumb"><Link href="/">Home</Link>  /  Booking confirmation</div>
+          <div className="success-wrap">
+            <Suspense fallback={<section className="success-card"><div className="card-body"><div className="section-title">Loading…</div></div></section>}>
+              <Confirmed />
+            </Suspense>
+
+            <div className="next-steps">
+              <div className="step"><div className="n">01</div><strong>Check your details</strong><p>Keep your booking ID handy in case you need help with this session.</p></div>
+              <div className="step"><div className="n">02</div><strong>Get session-ready</strong><p>Wear comfortable clothing and keep a mat and water bottle nearby.</p></div>
+              <div className="step"><div className="n">03</div><strong>Stay in the loop</strong><p>Session updates appear in your notifications and are sent to your registered contact.</p></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer><div className="container foot"><strong>HELLOFIT · Move better. Feel stronger.</strong><span>© 2026 HelloFit</span><span><Link href="/my-bookings">My bookings</Link>  ·  <Link href="/">Home</Link></span></div></footer>
+      <div className="toast" id="toast" role="status" aria-live="polite">Copied!</div>
     </div>
   );
 }

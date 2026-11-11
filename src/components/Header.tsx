@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Brand } from './Brand';
-import { useToast } from './Toast';
 
 const links = [
   { href: '#categories', label: 'Explore Fitness' },
@@ -13,7 +13,6 @@ const links = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const showToast = useToast();
 
   return (
     <header>
@@ -29,18 +28,15 @@ export function Header() {
         </nav>
 
         <div className="nav-actions">
-          <button
-            className="btn btn-ghost"
-            onClick={() => showToast('Login and registration screen will be designed next.')}
-          >
+          {/* Both now go to the real login page. They were toasts saying the
+              screen "will be designed next" — it exists and is wired, so the
+              placeholders went with it. Same classes, same labels. */}
+          <Link className="btn btn-ghost" href="/login">
             Log in
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => showToast('Registration flow will be connected in a later phase.')}
-          >
+          </Link>
+          <Link className="btn btn-primary" href="/login">
             Get Started <span>↗</span>
-          </button>
+          </Link>
           <button
             className="menu-toggle"
             aria-label="Toggle menu"

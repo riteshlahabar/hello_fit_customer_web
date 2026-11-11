@@ -8,7 +8,13 @@
 export type BookingStatus = 'upcoming' | 'completed' | 'cancelled';
 
 export type Booking = {
+  /** The human reference (HF-…), which is what the design shows. */
   id: string;
+  /**
+   * The API's uuid, which is what `/app/customer/bookings/:id` takes. Absent
+   * on the static fallback rows below, so every use must cope without it.
+   */
+  bookingId?: string;
   trainer: string;
   initials: string;
   service: string;

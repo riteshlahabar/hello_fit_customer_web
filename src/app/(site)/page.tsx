@@ -3,15 +3,20 @@ import { HeroSearch } from '@/components/HeroSearch';
 import { TrainerCard } from '@/components/TrainerCard';
 import {
   aboutPoints,
-  categories,
   heroAvatars,
   steps,
   testimonials,
   trainers,
   trustItems,
 } from '@/data/home';
+import { getCategories } from '@/lib/catalog';
 
-export default function Home() {
+// Server component: the category grid is fetched before render, so the
+// markup the crawler sees is the finished page. `getCategories` falls back
+// to the static array if the API is unreachable, so this never blanks.
+export default async function Home() {
+  const categories = await getCategories();
+
   return (
     <main id="home">
       {/* Hero ------------------------------------------------------------------ */}

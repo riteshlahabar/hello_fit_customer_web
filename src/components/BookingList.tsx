@@ -6,8 +6,9 @@ import {
   formatBookingDate,
   money,
   statusLabel,
+  type Booking,
   type BookingStatus,
-} from '@/data/bookings';
+} from "@/data/bookings";
 import { useToast } from './Toast';
 
 type Filter = 'all' | BookingStatus;
@@ -20,13 +21,6 @@ const TABS: { key: Filter; label: string }[] = [
   { key: 'cancelled', label: 'Cancelled' },
 ];
 
-const SERVICES = [
-  'Personal Yoga Session',
-  'Yoga & Flexibility',
-  'Online Yoga Session',
-  'Strength Training',
-];
-
 /**
  * The bookings tabs, filters and list.
  *
@@ -35,26 +29,34 @@ const SERVICES = [
  * `@/data/bookings`, which is shaped like the API response, so wiring the real endpoint
  * means replacing one import.
  */
-export function BookingList() {
-  const [filter, setFilter] = useState<Filter>('all');
+export function BookingList({ bookings = allBookings }: { bookings?: Booking[] }) {
+  const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState('');
   const [service, setService] = useState('all');
   const [sort, setSort] = useState<Sort>('newest');
   const showToast = useToast();
 
+  // Derived from what the customer actually has, not the demo's fixed four:
+  // a filter offering services you have never booked is a dead option, and
+  // one that omits a service you have booked hides rows.
+  const serviceOptions = useMemo(
+    () => [...new Set(bookings.map((b) => b.service))].sort(),
+    [bookings],
+  );
+
   const counts = useMemo(
     () => ({
-      all: allBookings.length,
-      upcoming: allBookings.filter((b) => b.status === 'upcoming').length,
-      completed: allBookings.filter((b) => b.status === 'completed').length,
-      cancelled: allBookings.filter((b) => b.status === 'cancelled').length,
+      all: bookings.length,
+      upcoming: bookings.filter((b) => b.status === 'upcoming').length,
+      completed: bookings.filter((b) => b.status === 'completed').length,
+      cancelled: bookings.filter((b) => b.status === "cancelled").length,
     }),
-    [],
+    [bookings],
   );
 
   const list = useMemo(() => {
     const q = query.toLowerCase().trim();
-    return allBookings
+    return bookings
       .filter((b) => filter === 'all' || b.status === filter)
       .filter(
         (b) =>
@@ -67,7 +69,7 @@ export function BookingList() {
         if (sort === 'priceLow') return a.price - b.price;
         return b.date.localeCompare(a.date);
       });
-  }, [filter, query, service, sort]);
+  }, [bookings, filter, query, service, sort]);
 
   return (
     <>
@@ -102,7 +104,7 @@ export function BookingList() {
           onChange={(e) => setService(e.target.value)}
         >
           <option value="all">All services</option>
-          {SERVICES.map((s) => (
+          {serviceOptions.map((s) => (
             <option key={s}>{s}</option>
           ))}
         </select>

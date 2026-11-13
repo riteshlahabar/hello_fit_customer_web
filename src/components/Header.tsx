@@ -4,11 +4,27 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Brand } from './Brand';
 
+/**
+ * `page` links navigate; the rest scroll to a section of the homepage, which
+ * is what the demo's header did and what the anchors below still exist for.
+ *
+ * "Find a Trainer" became a real link because every other page's header
+ * already points at `/find-a-trainer` — the homepage was the odd one out,
+ * scrolling to a band of static trainer cards instead. **That page itself is
+ * not live**: there is no public provider search endpoint (PDF §5.5/§5.6, the
+ * marketplace rework), so it still shows the demo's listings. Linking it at
+ * least makes the header consistent and the page reachable.
+ *
+ * "Explore Fitness" stays an anchor on purpose: `#categories` is the homepage's
+ * category grid and that grid already reads the live API, so it is the real
+ * thing already. There is no separate services page in the supplied designs to
+ * send it to.
+ */
 const links = [
-  { href: '#categories', label: 'Explore Fitness' },
-  { href: '#trainers', label: 'Find a Trainer' },
-  { href: '#how', label: 'How It Works' },
-  { href: '#about-hellofit', label: 'About Us' },
+  { href: '#categories', label: 'Explore Fitness', page: false },
+  { href: '/find-a-trainer', label: 'Find a Trainer', page: true },
+  { href: '#how', label: 'How It Works', page: false },
+  { href: '#about-hellofit', label: 'About Us', page: false },
 ];
 
 export function Header() {
@@ -20,11 +36,17 @@ export function Header() {
         <Brand />
 
         <nav className={open ? 'nav-links open' : 'nav-links'} id="navLinks">
-          {links.map((link) => (
-            <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) =>
+            link.page ? (
+              <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
+                {link.label}
+              </Link>
+            ) : (
+              <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+                {link.label}
+              </a>
+            ),
+          )}
         </nav>
 
         <div className="nav-actions">

@@ -16,7 +16,7 @@ import { apiGet } from './api';
 import { categories as staticCategories, type Category } from '@/data/home';
 
 /** The shape `GET /categories` returns. */
-interface ApiCategory {
+export interface ApiCategory {
   id: string;
   name: string;
   slug: string;
@@ -132,6 +132,23 @@ export async function getCategories(): Promise<Category[]> {
   if (!rows || rows.length === 0) return staticCategories;
 
   return fillMissingImages(rows.slice(0, HOME_GRID_CARDS).map(toCategory));
+}
+
+/**
+ * Categories as the API gives them, **not** mapped into home-grid cards.
+ *
+ * `getCategories()` above returns the grid's view model — number, title,
+ * blurb, image — and caps it at four, because that is what the design's
+ * `repeat(4,1fr)` row holds. The hero search tabs need something different:
+ * the real id to filter services by, the real name, and **all** of them.
+ *
+ * PDF 6.5 makes this an acceptance criterion rather than a nicety: "Active
+ * categories appear on customer-facing platforms." Deriving the tabs from the
+ * services instead would silently hide a category an administrator had just
+ * created and activated but not yet had a service published under.
+ */
+export async function getApiCategories(): Promise<ApiCategory[]> {
+  return (await apiGet<ApiCategory[]>('/categories')) ?? [];
 }
 
 /** Services, for the search and category pages. Empty array on failure. */

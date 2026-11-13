@@ -37,6 +37,10 @@
  * at the API on loopback, and bypasses Nginx — which also means a basic-auth
  * gate in front of the site does not block the site's own renders.
  */
+// Defaults to 3000, the API's local port. The review VPS runs it on 4000 to
+// stay clear of another project and sets API_INTERNAL_URL explicitly in the
+// PM2 ecosystem — so the default is the one that makes `npm run dev` work with
+// no setup, and the deployment states its own.
 const SERVER_BASE_URL =
   process.env.API_INTERNAL_URL ?? 'http://127.0.0.1:3000/api/v1';
 

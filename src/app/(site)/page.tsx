@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { HeroSearch } from '@/components/HeroSearch';
 import { TrainerCard } from '@/components/TrainerCard';
 import {
@@ -9,13 +10,22 @@ import {
   trainers,
   trustItems,
 } from '@/data/home';
-import { getCategories } from '@/lib/catalog';
+import { getApiCategories, getCategories, getServices } from '@/lib/catalog';
 
 // Server component: the category grid is fetched before render, so the
 // markup the crawler sees is the finished page. `getCategories` falls back
 // to the static array if the API is unreachable, so this never blanks.
 export default async function Home() {
-  const categories = await getCategories();
+  // Both in one pass: the hero search tabs are the categories and its
+  // suggestions are the services, so the admin panel drives the search bar.
+  // Three reads, one pass. `categories` is the grid view model (capped at
+  // four by the design); `searchCategories` is every active category, which
+  // PDF 6.5 requires to appear on customer-facing platforms.
+  const [categories, searchCategories, services] = await Promise.all([
+    getCategories(),
+    getApiCategories(),
+    getServices(),
+  ]);
 
   return (
     <main id="home">
@@ -40,9 +50,9 @@ export default async function Home() {
             </p>
 
             <div className="hero-buttons">
-              <a className="btn btn-primary" href="#search">
+              <Link className="btn btn-primary" href="/find-a-trainer">
                 Find your trainer <span>↗</span>
-              </a>
+              </Link>
               <a className="btn btn-light" href="#categories">
                 <span>▶</span> Explore fitness
               </a>
@@ -72,7 +82,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <HeroSearch />
+        <HeroSearch categories={searchCategories} services={services} />
       </section>
 
       {/* Trust strip ---------------------------------------------------------- */}
@@ -198,9 +208,9 @@ export default async function Home() {
               professionals. Real provider listings will be connected to the HelloFit
               backend.
             </p>
-            <a className="text-link" href="#search">
+            <Link className="text-link" href="/find-a-trainer">
               Explore all trainers ↗
-            </a>
+            </Link>
           </div>
 
           <div className="trainer-grid">

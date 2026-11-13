@@ -136,6 +136,29 @@ export async function refreshSession(): Promise<boolean> {
   return true;
 }
 
-export function signOut() {
-  tokenStore.clear();
+/**
+ * Sign out — PDF §3.1 and §5.1, whose acceptance criteria say the customer can
+ * "log out securely".
+ *
+ * **Clearing localStorage is not logging out.** This used to do only that, and
+ * the refresh token stayed valid on the server for its full 30 days: anyone
+ * holding a copy could keep minting access tokens for a session the customer
+ * believed they had ended. `POST /auth/logout` revokes it, which is the part
+ * that makes the word "securely" true.
+ *
+ * The local clear happens either way. A network failure must not leave the
+ * browser holding credentials — better a revoked-server/clean-client mismatch
+ * in the other direction than a signed-in browser the customer cannot leave.
+ */
+export async function signOut(): Promise<void> {
+  const access = tokenStore.access;
+  const refresh = tokenStore.refresh;
+
+  try {
+    if (access && refresh) {
+      await apiSend<null>('/auth/logout', 'POST', { refreshToken: refresh }, access);
+    }
+  } finally {
+    tokenStore.clear();
+  }
 }

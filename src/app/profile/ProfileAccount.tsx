@@ -18,6 +18,7 @@
 // - **Profile photo** — no avatar column and no upload route for customers.
 
 import { useCallback, useEffect, useState } from 'react';
+import { AvatarMenu } from '@/components/AvatarMenu';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -144,7 +145,7 @@ export function ProfileAccount() {
         </Link>
         <div className="topright">
           <a className="help" href="mailto:support@hellofit.example">Need help?</a>
-          <div className="avatar" id="topAvatar">{avatar}</div>
+          <AvatarMenu />
         </div>
       </header>
 

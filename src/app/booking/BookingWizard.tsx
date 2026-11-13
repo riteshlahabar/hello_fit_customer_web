@@ -23,7 +23,7 @@
 // auto-assign. PDF §5.5/§5.6 — the marketplace gap.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getServices } from '@/lib/catalog';
 import type { ApiService } from '@/lib/catalog';
 import { clockOf, getAddresses, getQuote, getSlots, nextDays } from '@/lib/booking';
@@ -49,6 +49,9 @@ function dateParts(iso: string) {
 
 export function BookingWizard() {
   const router = useRouter();
+  // Set by the homepage hero search, so a visitor who searched for a service
+  // lands on the booking flow with it already chosen.
+  const wantedService = useSearchParams().get('service') ?? '';
 
   const [services, setServices] = useState<ApiService[] | null>(null);
   const [addresses, setAddresses] = useState<ApiAddress[]>([]);
@@ -93,7 +96,11 @@ export function BookingWizard() {
       }
 
       setServices(live);
-      setServiceId((current) => current || live[0]?.id || '');
+      // `?service=<id>` from the homepage search, when it names a service that
+      // really exists — a stale or hand-edited id must not leave the wizard
+      // with nothing selected, so it falls back to the first service as before.
+      const requested = live.some((s) => s.id === wantedService) ? wantedService : '';
+      setServiceId((current) => current || requested || live[0]?.id || '');
       setAddresses(saved ?? []);
       setAddressId((current) => current || saved?.[0]?.id || '');
       setDate((current) => current || days[0]);
@@ -110,7 +117,7 @@ export function BookingWizard() {
     return () => {
       cancelled = true;
     };
-  }, [router, days]);
+  }, [router, days, wantedService]);
 
   // `GET /slots` needs all three, so there is nothing to ask for until the
   // address resolves. Derived rather than written into state by the effect.

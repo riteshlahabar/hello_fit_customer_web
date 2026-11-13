@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { BookingWizard } from './BookingWizard';
@@ -40,7 +41,11 @@ export default function BookingPage() {
             <div className="step" id="step4"><span className="step-num">4</span><div><strong>Review</strong><small>Confirm details</small></div></div>
           </div>
 
-          <BookingWizard />
+          {/* Suspense because BookingWizard reads ?service= via useSearchParams,
+              which Next refuses to prerender without a boundary. */}
+          <Suspense fallback={<p className="muted">Loading the booking form…</p>}>
+            <BookingWizard />
+          </Suspense>
         </div>
       </main>
 

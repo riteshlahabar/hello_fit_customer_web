@@ -52,6 +52,12 @@ export function Checkout() {
   const goal = params.get('goal') ?? '';
   const level = params.get('level') ?? '';
   const notes = params.get('notes') ?? '';
+  /**
+   * The trainer chosen on the profile or the search page, forwarded by the
+   * booking wizard. Reaches `instructorId` on `POST /bookings`; absent, the
+   * API auto-assigns as every website booking did before Phase 5.
+   */
+  const trainerId = params.get('trainer') ?? '';
 
   const [service, setService] = useState<ApiService | null>(null);
   const [address, setAddress] = useState<ApiAddress | null>(null);
@@ -149,6 +155,7 @@ export function Checkout() {
       sessionDate,
       fromMinute,
       ...(toMinute > fromMinute ? { toMinute } : {}),
+      ...(trainerId ? { instructorId: trainerId } : {}),
       ...(applied ? { couponCode: applied } : {}),
       preferences: { goal, level, ...(notes ? { note: notes } : {}) },
     });
@@ -211,7 +218,7 @@ export function Checkout() {
       setPaying(false);
       setStatus(cause instanceof Error ? cause.message : 'The payment gateway could not be reached.');
     }
-  }, [complete, serviceId, addressId, sessionDate, fromMinute, toMinute, applied, goal, level, notes, method, who, router]);
+  }, [complete, serviceId, addressId, sessionDate, fromMinute, toMinute, trainerId, applied, goal, level, notes, method, who, router]);
 
   const total = quote ? money(quote.payable) : '—';
 

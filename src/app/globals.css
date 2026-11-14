@@ -48,9 +48,23 @@ button {
 }
 
 /* Each route's wrapper must fill the viewport so its own background reaches the edges —
-   the demo set that on <body>, which is now outside the scope. */
-[data-hf-page] {
+   the demo set that on <body>, which is now outside the scope.
+   **Routes only.** Phase 0 put the shared header and footer in two more
+   `[data-hf-page="home"]` wrappers, and an attribute-only selector matched those
+   too — giving every page a full empty viewport under the header and another
+   under the footer. They are marked `data-hf-shell` and excluded. */
+[data-hf-page]:not([data-hf-shell]) {
   min-height: 100vh;
+}
+
+/* The shell wrappers exist only to carry the home scope's variables and header
+   rules; they must generate no box of their own. `display:contents` removes it
+   while leaving selector matching and inheritance intact — which also restores
+   the sticky header: with a box, `position:sticky` is confined to the wrapper
+   and unsticks after ~112px; without one the header's parent is <body> and it
+   stays put down the whole page, as the demo had it. */
+[data-hf-shell] {
+  display: contents;
 }
 
 /* The toast is rendered by ToastProvider at the root, outside every page scope. */
@@ -75,4 +89,33 @@ button {
   opacity: 1;
   transform: translate(-50%, 0);
   pointer-events: auto;
+}
+
+/* The shared header's avatar circle.
+ *
+ * `site.css` never had an `.avatar` rule — the demo's homepage header showed
+ * Log in / Get Started, and the thirteen inline headers each styled `.avatar`
+ * in their own page CSS. Phase 0 deleted those headers, so the avatar was
+ * rendering as bare text (the initials, or `—` before identity resolves).
+ *
+ * Scoped to `[data-hf-shell]` so it styles the header and footer only and
+ * cannot reach a converted page's own `.avatar`, which keeps its page rule.
+ * Figures are the dashboard's (`dashboard/page.css`), which is the one the
+ * client drew at this size. */
+[data-hf-shell] .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #f5d9cc;
+  color: #87372a;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  flex: 0 0 42px;
+  user-select: none;
+}
+
+[data-hf-shell] .avatar:hover {
+  box-shadow: 0 0 0 3px #fff0e8;
 }

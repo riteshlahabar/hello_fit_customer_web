@@ -1,0 +1,144 @@
+/* Self-contained copy of the dashboard sidebar's look, with its own `hf-`
+   prefixed class names so it cannot collide with a converted page's `.nav-btn`
+   or `.sidebar`. Same scrollbar rule as the dashboard: the list is long enough
+   to outgrow a laptop screen. */
+
+.hf-account-shell {
+  display: grid;
+  grid-template-columns: 245px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.hf-account-shell > .hf-account-main {
+  min-width: 0;
+}
+
+.hf-account-sidebar {
+  background: #fff;
+  border: 1px solid #eee4da;
+  border-radius: 20px;
+  padding: 22px 14px;
+  position: sticky;
+  top: 98px;
+  max-height: calc(100vh - 118px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hf-nav-label {
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  color: #a39b92;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
+.hf-nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 11px;
+  text-align: left;
+  color: #625d57;
+  font-weight: 500;
+  margin: 2px 0;
+  text-decoration: none;
+}
+
+.hf-nav-btn .hf-ico {
+  font-size: 17px;
+  width: 22px;
+  text-align: center;
+}
+
+.hf-nav-btn.active,
+.hf-nav-btn:hover {
+  background: #fff0e8;
+  color: #e33e29;
+  font-weight: 700;
+}
+
+.hf-sidebar-bottom {
+  margin-top: 25px;
+  padding: 15px 12px;
+  background: #fff6ec;
+  border-radius: 14px;
+}
+
+.hf-sidebar-bottom strong {
+  font-size: 12px;
+}
+
+.hf-sidebar-bottom p {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #777;
+  margin: 6px 0 12px;
+}
+
+.hf-text-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e33e29;
+  text-decoration: none;
+}
+
+/* Below the breakpoint the sidebar hides and the shared header's ☰ opens it,
+   which is the behaviour `SidebarToggle` already expects from `#sidebar`. */
+@media (max-width: 980px) {
+  .hf-account-shell {
+    display: block;
+  }
+
+  .hf-account-sidebar {
+    display: none;
+    position: static;
+    max-height: none;
+    margin-bottom: 20px;
+  }
+
+  .hf-account-sidebar.open {
+    display: block;
+  }
+}
+
+/* The user card, figures copied from `dashboard/page.css:17-20` so the shared
+   sidebar and the dashboard's own are indistinguishable. */
+.hf-user-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 10px 22px;
+  border-bottom: 1px solid #eee4da;
+  margin-bottom: 17px;
+}
+
+.hf-user-pic {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f8d8ca;
+  color: #8d3a2c;
+  font-weight: 800;
+  font-size: 17px;
+  flex: 0 0 46px;
+}
+
+.hf-user-mini strong {
+  display: block;
+  font-size: 13px;
+}
+
+.hf-user-mini small {
+  display: block;
+  color: #77736e;
+  font-size: 11px;
+  margin-top: 3px;
+}

@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 export default function BookingConfirmedPage() {
   return (
     <div data-hf-page="booking-confirmed">
-      <div className="announcement">YOUR FITNESS JOURNEY, MADE PERSONAL <b>• HELLOFIT</b></div>
-      <header><div className="container nav"><Link className="logo" href="/" aria-label="HelloFit home"><img src="/hellofit-logo.png" alt="HelloFit logo" /></Link><nav className="navlinks"><Link href="/">Home</Link><Link href="/my-bookings">My Bookings</Link><Link href="/profile">My Profile</Link></nav><Link className="navcta" href="/booking">Book again ↗</Link></div></header>
+      
+      
 
       <main className="hero">
         <div className="container">
@@ -40,7 +40,7 @@ export default function BookingConfirmedPage() {
         </div>
       </main>
 
-      <footer><div className="container foot"><strong>HELLOFIT · Move better. Feel stronger.</strong><span>© 2026 HelloFit</span><span><Link href="/my-bookings">My bookings</Link>  ·  <Link href="/">Home</Link></span></div></footer>
+      
       <div className="toast" id="toast" role="status" aria-live="polite">Copied!</div>
     </div>
   );

@@ -7,6 +7,17 @@ import type { NextConfig } from 'next';
 const DEV_API_ORIGIN = process.env.DEV_API_ORIGIN ?? 'http://localhost:3000';
 
 const nextConfig: NextConfig = {
+  /**
+   * Build output directory, overridable.
+   *
+   * `next dev` and `next build` both own `.next`, so a verification build run
+   * while the developer's dev server is up fights it over the same folder and
+   * leaves that server serving a half-written build. Setting
+   * `NEXT_DIST_DIR=.next-verify` gives the second one its own, so a smoke run
+   * against a fresh API never costs anybody their running site.
+   */
+  distDir: process.env.NEXT_DIST_DIR ?? '.next',
+
   images: {
     // The demo hotlinks every photo from Unsplash. Fine for a prototype; before launch
     // these become real provider photos served from the project's own S3 + CDN.

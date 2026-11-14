@@ -193,3 +193,23 @@
 [data-hf-page="trainer-profile"] .tabs button {font-size:10px}
 [data-hf-page="trainer-profile"] .footer-grid {gap:20px 13px}
 }
+
+/* ---------------------------------------------------------------------------
+   Added for HelloFit, 13 Nov 2026 (Phase 5) — NOT part of the client's demo.
+   The demo put a stock-photo avatar on every review. `Review` carries no
+   reviewer photo and `CustomerProfile` has no photo column, so attaching a
+   stock face to a real customer's words is not an option. This fills the same
+   40px slot `.review-user img` occupied, so the row keeps its layout.
+--------------------------------------------------------------------------- */
+[data-hf-page="trainer-profile"] .hf-review-initial {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  background: #f3e9dd;
+  color: #e33e29;
+  font-size: 15px;
+}

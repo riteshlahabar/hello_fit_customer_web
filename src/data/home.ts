@@ -1,9 +1,14 @@
 /**
  * Homepage content, lifted from the client demo's hardcoded markup.
  *
- * This is prototype copy, not live data. Everything here is shaped to be replaced by a
- * backend call later — categories by `GET /catalog/categories`, trainers by the provider
- * search endpoint — so the components below never hardcode content themselves.
+ * What is left here is **design copy with no field behind it** — the trust
+ * strip, the about points, the How-it-works steps, the testimonials. It is the
+ * client's approved wording, not stand-in data.
+ *
+ * The two arrays that *were* stand-in data have gone live: categories read
+ * `GET /categories` through `lib/catalog.ts` (this file's `categories` is now
+ * only the fallback when the API is unreachable), and the three invented
+ * trainers were deleted on 13 Nov 2026 for `topProviders()` — see below.
  */
 
 export type TrustItem = { icon: string; title: string; sub: string };
@@ -25,6 +30,10 @@ export const aboutPoints: AboutPoint[] = [
 ];
 
 export type Category = {
+  /** The real category id when the API supplied it. Absent on the static
+   * fallback array, which has no ids — the card then links to the unfiltered
+   * search rather than inventing a `categoryId` the API would reject. */
+  id?: string;
   number: string;
   title: string;
   blurb: string;
@@ -67,52 +76,13 @@ export const categories: Category[] = [
   },
 ];
 
-export type Trainer = {
-  id: string;
-  name: string;
-  role: string;
-  tag: string;
-  rating: string;
-  price: string;
-  image: string;
-  alt: string;
-};
-
-export const trainers: Trainer[] = [
-  {
-    id: 'alex-morgan',
-    name: 'Alex Morgan',
-    role: 'Strength & conditioning',
-    tag: 'PERSONAL TRAINING',
-    rating: '4.9',
-    price: '₹900',
-    image:
-      'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=800&q=80',
-    alt: 'Fitness trainer profile',
-  },
-  {
-    id: 'maya-sharma',
-    name: 'Maya Sharma',
-    role: 'Yoga & mindful movement',
-    tag: 'YOGA',
-    rating: '4.8',
-    price: '₹700',
-    image:
-      'https://images.unsplash.com/photo-1599447421416-3414500d18a5?auto=format&fit=crop&w=800&q=80',
-    alt: 'Yoga instructor profile',
-  },
-  {
-    id: 'rohan-mehta',
-    name: 'Rohan Mehta',
-    role: 'Functional fitness coach',
-    tag: 'FUNCTIONAL FITNESS',
-    rating: '4.9',
-    price: '₹800',
-    image:
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80',
-    alt: 'Functional fitness coach profile',
-  },
-];
+/**
+ * The three invented trainers that stood here — "Alex Morgan" 4.9 ₹900,
+ * "Maya Sharma", "Rohan Mehta" — were DELETED on 13 Nov 2026 (Phase 5), not
+ * left unused. The homepage band now reads `topProviders()`; a fake person
+ * with a Book button left in the repo is the one that gets re-imported by
+ * mistake. `ProviderCard` from `lib/providers.ts` is the shape now.
+ */
 
 export type Step = { no: string; title: string; body: string };
 

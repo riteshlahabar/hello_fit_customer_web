@@ -9,13 +9,17 @@
 // and nothing more. US-W08 requires exactly that ("availability is checked by
 // the backend").
 //
-// **Two things the website cannot supply today**, both flagged for the client:
+// **A provider can be chosen as of 13 Nov 2026 (Phase 5).** `?trainer=<id>`
+// on `/booking` reaches `instructorId` on both `GET /slots` and
+// `POST /bookings`, which the backend has accepted all along: the slot grid
+// then shows only that trainer's free times, and the create re-checks they
+// are still free for every occurrence before taking money. Omitted, the
+// booking is auto-assigned exactly as before — that path is unchanged, so a
+// customer who starts from the catalog rather than a profile is unaffected.
 //
-// 1. **A provider.** `CreateBookingDto.instructorId` exists ("set to request a
-//    specific teacher"), but there is no public provider search or profile
-//    endpoint to choose one from, so the website books auto-assign. This is
-//    the same gap that blocks Find a Trainer — PDF §5.5 and §5.6.
-// 2. **A service area on a new address.** `GET /slots` returns an empty grid
+// **One thing the website still cannot supply**, flagged for the client:
+//
+// 1. **A service area on a new address.** `GET /slots` returns an empty grid
 //    when the address has no `areaId`, and `POST /addresses` takes `areaId`
 //    from the client. There is no public endpoint listing areas and no
 //    pincode-to-area resolution on the server, although the `pincodes` table
@@ -74,11 +78,18 @@ export interface SlotsResult {
   error?: string;
 }
 
-export async function getSlots(serviceId: string, date: string, addressId: string): Promise<SlotsResult> {
+export async function getSlots(
+  serviceId: string,
+  date: string,
+  addressId: string,
+  /** Narrows the grid to one trainer — `/booking?trainer=<id>`, PDF §3.6. */
+  instructorId?: string,
+): Promise<SlotsResult> {
   const token = auth();
   if (!token) return { slots: [], error: 'Please sign in to see available times' };
 
   const query = new URLSearchParams({ serviceId, date, addressId });
+  if (instructorId) query.set('instructorId', instructorId);
   const result = await apiGetResult<Slot[]>(`/app/customer/slots?${query}`, { token });
 
   if (!result.ok) return { slots: [], error: result.error.message };
@@ -131,6 +142,14 @@ export interface CreateInput extends QuoteInput {
   fromMinute: number;
   toMinute?: number;
   /**
+   * The trainer the customer chose. Omitted, the API auto-assigns, which is
+   * what every website booking did before Phase 5. Set, the API re-checks
+   * that trainer is still free for every occurrence and refuses with a 409
+   * naming the date rather than quietly assigning somebody else — the one
+   * outcome that would make the chosen trainer meaningless.
+   */
+  instructorId?: string;
+  /**
    * Customer-supplied booking preferences — the goal, level and trainer note
    * the design collects. `Booking.preferences` is the Json column meant for
    * them, so they are kept rather than dropped. Nothing surfaces them to the
@@ -157,6 +176,7 @@ export async function createBooking(input: CreateInput): Promise<CreateResult> {
       sessionDate: input.sessionDate,
       fromMinute: input.fromMinute,
       ...(input.toMinute !== undefined ? { toMinute: input.toMinute } : {}),
+      ...(input.instructorId ? { instructorId: input.instructorId } : {}),
       ...(input.sessionCount ? { sessionCount: input.sessionCount } : {}),
       ...(input.addonIds?.length ? { addonIds: input.addonIds } : {}),
       ...(input.couponCode ? { couponCode: input.couponCode } : {}),

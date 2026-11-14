@@ -13,7 +13,7 @@
 [data-hf-page="dashboard"] .help {color:#625d57;text-decoration:none;font-size:13px}
 [data-hf-page="dashboard"] .avatar {width:42px;height:42px;border-radius:50%;background:#f5d9cc;color:#87372a;display:grid;place-items:center;font-weight:800}
 [data-hf-page="dashboard"] .layout {max-width:1400px;margin:auto;padding:30px 4.5%;display:grid;grid-template-columns:245px minmax(0,1fr);gap:28px}
-[data-hf-page="dashboard"] .sidebar {background:white;border:1px solid var(--line);border-radius:20px;padding:22px 14px;height:max-content;position:sticky;top:98px}
+[data-hf-page="dashboard"] .sidebar {background:white;border:1px solid var(--line);border-radius:20px;padding:22px 14px;position:sticky;top:98px;max-height:calc(100vh - 118px);overflow-y:auto;overscroll-behavior:contain}
 [data-hf-page="dashboard"] .user-mini {display:flex;align-items:center;gap:12px;padding:3px 10px 22px;border-bottom:1px solid var(--line);margin-bottom:17px}
 [data-hf-page="dashboard"] .user-pic {width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#f8d8ca;color:#8d3a2c;font-weight:800;font-size:17px}
 [data-hf-page="dashboard"] .user-mini strong {display:block;font-size:13px}

@@ -1,24 +1,14 @@
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import './site.css';
-
 /**
- * The public marketing shell — announcement bar, nav header, footer.
+ * The homepage's own scope.
  *
- * Only the homepage uses it. Every signed-in page in the demo ships its own `.topbar`
- * inside its own markup, so those routes sit outside this group and render bare.
+ * The announcement bar, header and footer moved up to the root layout on
+ * 13 Nov 2026 so every page carries the same ones. What is left here is the
+ * `data-hf-page="home"` wrapper that `site.css` is scoped to — the homepage's
+ * own 271 rules, which must not apply to any other route.
  *
- * `data-hf-page="home"` is what scopes site.css; the header and footer must sit inside it.
+ * `site.css` itself is imported by the root layout, because the shared header
+ * and footer are styled by it too.
  */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div data-hf-page="home">
-      <div className="announcement">
-        MOVE BETTER. FEEL STRONGER. <strong>YOUR FITNESS, YOUR WAY.</strong>
-      </div>
-      <Header />
-      {children}
-      <Footer />
-    </div>
-  );
+  return <div data-hf-page="home">{children}</div>;
 }

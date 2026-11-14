@@ -102,6 +102,8 @@ function toBooking(row: ApiBooking): Booking {
   return {
     id: row.code,
     bookingId: row.id,
+    ...(row.service?.id ? { serviceId: row.service.id } : {}),
+    ...(first?.instructor?.id ? { instructorId: first.instructor.id } : {}),
     trainer,
     initials: first?.instructor ? initialsOf(trainer) : '–',
     service,

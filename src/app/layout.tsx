@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 
-
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
 import { ToastProvider } from '@/components/Toast';
 import './globals.css';
+import './(site)/site.css';
 
 export const metadata: Metadata = {
   title: 'HelloFit — Your time, Your Place',
@@ -31,9 +33,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        {/* The marketing header/footer live in (site)/layout.tsx, not here — the converted
-            account pages carry their own .topbar from the demo and must render bare. */}
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          {/*
+            One header and one footer on every page, signed in or not — client
+            instruction, 13 Nov 2026. They replace 13 hand-written headers and 15
+            inline footers that no two pages agreed on.
+
+            **They are siblings of the page, never its parent.** Each converted
+            page's CSS is scoped to its own `[data-hf-page="<slug>"]` because the
+            demo redefines `.btn`, `.brand`, `.card` and even `h1` differently per
+            page (see globals.css). Wrapping the page in the home scope to style
+            the header would leak all 271 of home's rules into every other page —
+            `[data-hf-page="home"] h1` would restyle every heading on Billing.
+            As siblings, each scope styles only its own subtree.
+          */}
+          <div data-hf-page="home" data-hf-shell>
+            <div className="announcement">
+              MOVE BETTER. FEEL STRONGER. <strong>YOUR FITNESS, YOUR WAY.</strong>
+            </div>
+            <Header />
+          </div>
+
+          {children}
+
+          <div data-hf-page="home" data-hf-shell>
+            <Footer />
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

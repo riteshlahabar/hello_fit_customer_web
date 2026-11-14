@@ -18,10 +18,8 @@
 // - **Profile photo** — no avatar column and no upload route for customers.
 
 import { useCallback, useEffect, useState } from 'react';
-import { AvatarMenu } from '@/components/AvatarMenu';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { StaticSections } from './StaticSections';
 import { loadProfile, saveProfile } from '@/lib/profile';
 import type { ProfileForm } from '@/lib/profile';
@@ -135,19 +133,10 @@ export function ProfileAccount() {
 
   return (
     <>
-      <header className="topbar">
-        {/* next/image rather than the demo's bare img tag: the exemption in
-            eslint.config.mjs covers the route page files only, and this topbar
-            now lives in a component. The CSS still sizes it (142x56), so the
-            intrinsic size here only tells the optimiser what to fetch. */}
-        <Link className="brand" href="/">
-          <Image src="/hellofit-logo.png" alt="HelloFit logo" width={142} height={56} priority />
-        </Link>
-        <div className="topright">
-          <a className="help" href="mailto:support@hellofit.example">Need help?</a>
-          <AvatarMenu />
-        </div>
-      </header>
+      {/* The demo's own topbar was removed here on 13 Nov: the shared Header
+          in the root layout carries the brand, the menu and the avatar on
+          every page now, and keeping this one gave /profile two headers.
+          smoke:web-shell counts them, which is how it was caught. */}
 
       <div className="layout">
         <aside className="sidebar" id="sidebar">

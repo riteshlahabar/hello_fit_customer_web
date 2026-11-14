@@ -85,6 +85,7 @@ function toCategory(row: ApiCategory, index: number): Category {
     (services > 0 ? `${services} SERVICE${services === 1 ? '' : 'S'}` : 'EXPLORE');
 
   return {
+    id: row.id,
     number: `${String(index + 1).padStart(2, '0')} / ${kicker}`,
     title: row.name,
     blurb: row.description ?? 'Find the professional who fits your goals',

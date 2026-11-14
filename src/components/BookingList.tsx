@@ -1,15 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   bookings as allBookings,
   formatBookingDate,
-  money,
   statusLabel,
   type Booking,
   type BookingStatus,
 } from "@/data/bookings";
-import { useToast } from './Toast';
+import { BookingActions } from './BookingActions';
 
 type Filter = 'all' | BookingStatus;
 type Sort = 'newest' | 'oldest' | 'priceHigh' | 'priceLow';
@@ -34,7 +34,6 @@ export function BookingList({ bookings = allBookings }: { bookings?: Booking[] }
   const [query, setQuery] = useState('');
   const [service, setService] = useState('all');
   const [sort, setSort] = useState<Sort>('newest');
-  const showToast = useToast();
 
   // Derived from what the customer actually has, not the demo's fixed four:
   // a filter offering services you have never booked is a dead option, and
@@ -163,54 +162,7 @@ export function BookingList({ bookings = allBookings }: { bookings?: Booking[] }
               </div>
             </div>
 
-            <aside className="booking-side">
-              <div className="price-wrap">
-                <div className="price-label">Session total</div>
-                <div className="price">{money(b.price)}</div>
-                <div className="ref">Ref: {b.id}</div>
-              </div>
-
-              <button
-                className="btn btn-light"
-                onClick={() => showToast(`Booking ${b.id} — detail view is part of the next stage.`)}
-              >
-                View details ↗
-              </button>
-
-              {b.status === 'upcoming' ? (
-                <>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => showToast('Reschedule will be connected to the booking API.')}
-                  >
-                    Reschedule
-                  </button>
-                  <button
-                    className="btn btn-light"
-                    onClick={() => showToast('Cancellation follows the refund slabs in settings.')}
-                  >
-                    Cancel booking
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="btn btn-light"
-                    onClick={() => showToast('Receipts come from the invoice endpoint.')}
-                  >
-                    View receipt
-                  </button>
-                  {b.status === 'completed' && (
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => showToast('Book again will prefill the booking flow.')}
-                    >
-                      Book again
-                    </button>
-                  )}
-                </>
-              )}
-            </aside>
+            <BookingActions b={b} />
           </article>
         ))}
       </div>
@@ -220,16 +172,13 @@ export function BookingList({ bookings = allBookings }: { bookings?: Booking[] }
           <div className="big">⌕</div>
           <h3>No bookings found</h3>
           <p>Try another search or filter, or book your next session.</p>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setFilter('all');
-              setQuery('');
-              setService('all');
-            }}
-          >
+          {/* The button says "Find a trainer" and reset the filters instead —
+              the copy above already offers "another search or filter" through
+              the controls, and this is the clause about booking. Linked to the
+              page it names, 13 Nov 2026. */}
+          <Link className="btn btn-primary" href="/find-a-trainer">
             Find a trainer
-          </button>
+          </Link>
         </div>
       )}
     </>

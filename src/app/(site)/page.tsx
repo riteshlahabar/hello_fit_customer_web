@@ -7,10 +7,10 @@ import {
   heroAvatars,
   steps,
   testimonials,
-  trainers,
   trustItems,
 } from '@/data/home';
 import { getApiCategories, getCategories, getServices } from '@/lib/catalog';
+import { topProviders } from '@/lib/providers';
 
 // Server component: the category grid is fetched before render, so the
 // markup the crawler sees is the finished page. `getCategories` falls back
@@ -21,10 +21,13 @@ export default async function Home() {
   // Three reads, one pass. `categories` is the grid view model (capped at
   // four by the design); `searchCategories` is every active category, which
   // PDF 6.5 requires to appear on customer-facing platforms.
-  const [categories, searchCategories, services] = await Promise.all([
+  // `featured` is the three highest-rated providers — the band that showed
+  // three invented people until 13 Nov 2026 (Phase 5).
+  const [categories, searchCategories, services, featured] = await Promise.all([
     getCategories(),
     getApiCategories(),
     getServices(),
+    topProviders(3),
   ]);
 
   return (
@@ -145,9 +148,9 @@ export default async function Home() {
               ))}
             </div>
 
-            <a className="btn btn-primary" href="#search">
+            <Link className="btn btn-primary" href="/find-a-trainer">
               Discover HelloFit <span>↗</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -172,7 +175,15 @@ export default async function Home() {
 
           <div className="category-grid">
             {categories.map((category) => (
-              <a className="category-card" href="#search" key={category.title}>
+              <Link
+                className="category-card"
+                href={
+                  category.id
+                    ? `/find-a-trainer?categoryId=${category.id}`
+                    : '/find-a-trainer'
+                }
+                key={category.title}
+              >
                 <Image
                   src={category.image}
                   alt={category.alt}
@@ -185,7 +196,7 @@ export default async function Home() {
                   <p>{category.blurb}</p>
                 </div>
                 <span className="circle-arrow">↗</span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -204,25 +215,29 @@ export default async function Home() {
               </h2>
             </div>
             <p>
-              Explore a few sample profiles to see how you&rsquo;ll discover fitness
-              professionals. Real provider listings will be connected to the HelloFit
-              backend.
+              A few of the highest-rated trainers on HelloFit. Open a profile to
+              see their services, prices and the areas they cover.
             </p>
             <Link className="text-link" href="/find-a-trainer">
               Explore all trainers ↗
             </Link>
           </div>
 
-          <div className="trainer-grid">
-            {trainers.map((trainer) => (
-              <TrainerCard key={trainer.id} trainer={trainer} />
-            ))}
-          </div>
-
-          <p style={{ fontSize: 10, color: '#898178', margin: '18px 0 0' }}>
-            *Trainer names, ratings, and prices are illustrative prototype content, not live
-            listings.
-          </p>
+          {/* No fallback: a failed call renders no cards rather than the three
+              invented trainers this band used to show. A fake person with a
+              Book button is worse than an empty band. */}
+          {featured.length > 0 ? (
+            <div className="trainer-grid">
+              {featured.map((trainer) => (
+                <TrainerCard key={trainer.id} trainer={trainer} />
+              ))}
+            </div>
+          ) : (
+            <p className="muted">
+              No trainers are listed yet. <Link href="/find-a-trainer">Search</Link>{' '}
+              to see everyone as they join.
+            </p>
+          )}
         </div>
       </section>
 
@@ -297,9 +312,9 @@ export default async function Home() {
               <h2>Make space for the stronger, healthier you.</h2>
               <p>Start with one session. Build a routine that feels like yours.</p>
             </div>
-            <a className="btn" href="#search">
+            <Link className="btn" href="/find-a-trainer">
               Find your HelloFit ↗
-            </a>
+            </Link>
           </div>
         </div>
       </section>

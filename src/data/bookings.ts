@@ -15,6 +15,15 @@ export type Booking = {
    * on the static fallback rows below, so every use must cope without it.
    */
   bookingId?: string;
+  /**
+   * The ids behind the two names below, carried so "Book again" can reopen
+   * the booking page with the same service and the same trainer preselected
+   * (Phase 5, 13 Nov 2026). Absent on the static fallback rows, and
+   * `instructorId` is also absent on a booking still awaiting assignment —
+   * both cases fall back to an unfiltered `/booking`.
+   */
+  serviceId?: string;
+  instructorId?: string;
   trainer: string;
   initials: string;
   service: string;

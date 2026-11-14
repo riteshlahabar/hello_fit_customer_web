@@ -57,11 +57,11 @@ export function LoginForm({
       </button>
       <p className="legal">
         By continuing, you agree to our{' '}
-        <a className="text-link" href="#terms">
+        <a className="text-link" href="/terms-conditions">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a className="text-link" href="#privacy">
+        <a className="text-link" href="/privacy-policy">
           Privacy Policy
         </a>
         .
@@ -115,11 +115,11 @@ export function RegisterForm({
       <div className="rowline">
         <label className="check">
           <input id="agree" type="checkbox" /> I agree to the{' '}
-          <a href="#terms" className="text-link">
+          <a href="/terms-conditions" className="text-link">
             Terms
           </a>{' '}
           and{' '}
-          <a href="#privacy" className="text-link">
+          <a href="/privacy-policy" className="text-link">
             Privacy Policy
           </a>
           .

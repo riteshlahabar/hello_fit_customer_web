@@ -23,6 +23,9 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // A verification build run beside the dev server (NEXT_DIST_DIR), 13 Nov
+    // 2026 — generated output, never source.
+    ".next-verify/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

@@ -17,6 +17,7 @@
 // (`--line`, `--ink`, `--orange`, `--shadow`) so it does not look bolted on.
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signOut } from '@/lib/auth';
 import { forgetIdentity, useIdentity } from '@/lib/identity';
@@ -48,6 +49,21 @@ const ITEM: React.CSSProperties = {
   color: 'var(--ink, #161614)',
   cursor: 'pointer',
 };
+
+const DIVIDER: React.CSSProperties = {
+  height: '1px',
+  background: 'var(--line, #eee5dc)',
+  margin: '5px 8px',
+};
+
+/** Where a signed-in customer needs to get to from any page. */
+const ACCOUNT_LINKS: string[][] = [
+  ['/dashboard', 'My Dashboard'],
+  ['/my-bookings', 'My Bookings'],
+  ['/billing', 'Billing History'],
+  ['/refunds', 'Refunds'],
+  ['/profile', 'Profile & Settings'],
+];
 
 export function AvatarMenu() {
   const { name, initials, signedIn } = useIdentity();
@@ -116,6 +132,16 @@ export function AvatarMenu() {
               <div style={{ ...ITEM, cursor: 'default', color: 'var(--muted, #77736e)', fontWeight: 500 }}>
                 {name}
               </div>
+              {/* The way back. Off the dashboard — on the homepage, say —
+                  this menu was the only signed-in control on the page and it
+                  offered no route to the account, so a stray click on Home
+                  stranded you. */}
+              {ACCOUNT_LINKS.map(([href, label]) => (
+                <Link key={href} href={href} role="menuitem" style={ITEM} onClick={() => setOpen(false)}>
+                  {label}
+                </Link>
+              ))}
+              <div style={DIVIDER} />
               <button
                 type="button"
                 role="menuitem"

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { AvatarMenu } from '@/components/AvatarMenu';
 import type { Metadata } from 'next';
 import { ReviewsBoard } from './ReviewsBoard';
 import './page.css';
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
 export default function ReviewsPage() {
   return (
     <div data-hf-page="reviews">
-      <header className="topbar"><Link className="brand" href="/"><img src="/hellofit-logo.png" alt="HelloFit logo" /><span>Hello<b>Fit</b></span></Link><nav className="nav"><Link href="/">Home</Link><Link href="/find-a-trainer">Find a Trainer</Link><Link href="/my-bookings">My Bookings</Link><Link href="/saved-trainers">Favourites</Link></nav><div className="user"><AvatarMenu /><div><strong style={{ display: "block", fontSize: "12px" }}>My account</strong><span style={{ fontSize: "10px", color: "#888" }}>Customer account</span></div><span className="mobile">☰</span></div></header>
+      
 
       <main className="wrap">
         <div className="crumb"><Link href="/">Home</Link> / <Link href="/dashboard">My Account</Link> / <span>Reviews &amp; Ratings</span></div>

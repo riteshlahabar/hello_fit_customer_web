@@ -2,33 +2,49 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useIdentity } from '@/lib/identity';
+import { AvatarMenu } from './AvatarMenu';
+import { SidebarToggle } from './SidebarToggle';
 import { Brand } from './Brand';
 
 /**
- * `page` links navigate; the rest scroll to a section of the homepage, which
- * is what the demo's header did and what the anchors below still exist for.
+ * The one marketing menu, identical here and on the four converted pages that
+ * carry their own inline header (booking, checkout, find-a-trainer,
+ * trainer-profile).
  *
- * "Find a Trainer" became a real link because every other page's header
- * already points at `/find-a-trainer` — the homepage was the odd one out,
- * scrolling to a band of static trainer cards instead. **That page itself is
- * not live**: there is no public provider search endpoint (PDF §5.5/§5.6, the
- * marketplace rework), so it still shows the demo's listings. Linking it at
- * least makes the header consistent and the page reachable.
+ * **The client's demo disagreed with itself.** index.html drew four items
+ * (Explore Fitness / Find a Trainer / How It Works / About Us); the inner
+ * pages drew six (Home / Find a Trainer / Categories / How It Works / About /
+ * Contact). Clicking Home therefore landed you on a header missing half its
+ * items, with Categories renamed. Client's call, 13 Nov 2026: one menu,
+ * "Explore Fitness" as the wording, and Contact pointing at the real
+ * /support-tickets page rather than the demo's dead #footer anchor.
  *
- * "Explore Fitness" stays an anchor on purpose: `#categories` is the homepage's
- * category grid and that grid already reads the live API, so it is the real
- * thing already. There is no separate services page in the supplied designs to
- * send it to.
+ * `page` links navigate; the rest scroll to a section of the homepage.
+ * Those section IDs exist only here, so off the homepage they did nothing at
+ * all — the mobile menu just closed and the visitor saw no reaction.
+ * `sectionHref` prefixes them with `/` everywhere except the homepage, where
+ * a bare hash is kept so the browser smooth-scrolls instead of navigating.
  */
 const links = [
+  { href: '/', label: 'Home', page: true },
   { href: '#categories', label: 'Explore Fitness', page: false },
+  { href: '/plans', label: 'Plans', page: true },
   { href: '/find-a-trainer', label: 'Find a Trainer', page: true },
   { href: '#how', label: 'How It Works', page: false },
   { href: '#about-hellofit', label: 'About Us', page: false },
+  { href: '/support-tickets', label: 'Contact', page: true },
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const onHome = usePathname() === '/';
+  const { signedIn } = useIdentity();
+
+  // A homepage-only ID is unreachable from the other 21 pages unless the link
+  // takes the visitor home first.
+  const sectionHref = (hash: string) => (onHome ? hash : `/${hash}`);
 
   return (
     <header>
@@ -42,7 +58,7 @@ export function Header() {
                 {link.label}
               </Link>
             ) : (
-              <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+              <a key={link.href} href={sectionHref(link.href)} onClick={() => setOpen(false)}>
                 {link.label}
               </a>
             ),
@@ -50,15 +66,33 @@ export function Header() {
         </nav>
 
         <div className="nav-actions">
-          {/* Both now go to the real login page. They were toasts saying the
-              screen "will be designed next" — it exists and is wired, so the
-              placeholders went with it. Same classes, same labels. */}
-          <Link className="btn btn-ghost" href="/login">
-            Log in
-          </Link>
-          <Link className="btn btn-primary" href="/login">
-            Get Started <span>↗</span>
-          </Link>
+          {/*
+            The avatar is rendered **unconditionally**, which is not an
+            oversight.
+
+            `useIdentity` only knows who you are in the browser, so a
+            `signedIn ? <AvatarMenu/> : …` gate puts no avatar in the server
+            HTML at all — and logout lives in that menu (client instruction,
+            12 Nov 2026). The first version of this file did exactly that and
+            smoke:web-logout failed on all 14 signed-in pages. The thirteen
+            inline headers it replaces rendered it unconditionally too;
+            AvatarMenu itself offers Log in or Log out as appropriate.
+
+            The two buttons are the signed-out state of the demo's homepage
+            header, so they go when there is someone to greet.
+          */}
+          {!signedIn && (
+            <>
+              <Link className="btn btn-ghost" href="/login">
+                Log in
+              </Link>
+              <Link className="btn btn-primary" href="/login">
+                Get Started <span>↗</span>
+              </Link>
+            </>
+          )}
+          <AvatarMenu />
+          <SidebarToggle />
           <button
             className="menu-toggle"
             aria-label="Toggle menu"

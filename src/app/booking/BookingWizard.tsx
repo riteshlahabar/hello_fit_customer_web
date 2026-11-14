@@ -18,9 +18,12 @@
 // - **04 Review** — name, email and mobile from the profile, read-only here
 //   because this screen has no mandate to change the account.
 //
-// The summary's trainer block is not rendered: there is no public provider
-// endpoint, so the website cannot name or choose one and the booking goes to
-// auto-assign. PDF §5.5/§5.6 — the marketplace gap.
+// **A trainer can be chosen as of 13 Nov 2026 (Phase 5).** `?trainer=<id>`
+// arrives from Find a Trainer, the trainer profile or Saved Trainers; it
+// narrows the slot grid to that person, shows `ChosenTrainer` above the
+// panels so the narrowing is visible, and travels on to checkout, which
+// creates the booking. Without it the booking is auto-assigned exactly as
+// before — PDF §3.6 is a choice, not a requirement.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -30,6 +33,7 @@ import { clockOf, getAddresses, getQuote, getSlots, nextDays } from '@/lib/booki
 import type { Quote, Slot } from '@/lib/booking';
 import { loadProfile } from '@/lib/profile';
 import type { ApiAddress } from '@/lib/profile';
+import { ChosenTrainer } from './ChosenTrainer';
 
 const money = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
@@ -49,9 +53,22 @@ function dateParts(iso: string) {
 
 export function BookingWizard() {
   const router = useRouter();
+  const params = useSearchParams();
   // Set by the homepage hero search, so a visitor who searched for a service
   // lands on the booking flow with it already chosen.
-  const wantedService = useSearchParams().get('service') ?? '';
+  const wantedService = params.get('service') ?? '';
+  /**
+   * `?trainer=<id>` — the trainer the customer chose on Find a Trainer, the
+   * trainer profile or Saved Trainers (PDF §3.6). It narrows the slot grid to
+   * that person's free times and travels on to checkout, which creates the
+   * booking. Absent, nothing changes: the API auto-assigns as before.
+   *
+   * It is **not** validated against a provider list here. A wrong id makes
+   * `GET /slots` return an empty grid with the API's own message, which is the
+   * honest outcome; fetching the profile only to decide whether to trust the
+   * URL would be a second round trip before the page could show anything.
+   */
+  const trainerId = params.get('trainer') ?? '';
 
   const [services, setServices] = useState<ApiService[] | null>(null);
   const [addresses, setAddresses] = useState<ApiAddress[]>([]);
@@ -122,7 +139,10 @@ export function BookingWizard() {
   // `GET /slots` needs all three, so there is nothing to ask for until the
   // address resolves. Derived rather than written into state by the effect.
   const canQuerySlots = Boolean(serviceId && date && addressId);
-  const slotKey = `${serviceId}|${date}|${addressId}`;
+  // The trainer belongs in the key: switching trainer is a different question
+  // with a different answer, and without it the grid would keep showing the
+  // previous one's times.
+  const slotKey = `${serviceId}|${date}|${addressId}|${trainerId}`;
 
   // The slot grid. Re-queried whenever any of its three inputs moves.
   useEffect(() => {
@@ -131,7 +151,7 @@ export function BookingWizard() {
     let cancelled = false;
 
     void (async () => {
-      const result = await getSlots(serviceId, date, addressId);
+      const result = await getSlots(serviceId, date, addressId, trainerId || undefined);
       if (cancelled) return;
 
       setLoaded({ key: slotKey, slots: result.slots, note: result.error ?? result.message ?? null });
@@ -141,7 +161,7 @@ export function BookingWizard() {
     return () => {
       cancelled = true;
     };
-  }, [serviceId, date, addressId, canQuerySlots, slotKey]);
+  }, [serviceId, date, addressId, trainerId, canQuerySlots, slotKey]);
 
   // Only the answer to the query being shown counts.
   const showing = loaded?.key === slotKey ? loaded : null;
@@ -179,14 +199,20 @@ export function BookingWizard() {
       goal,
       level,
       ...(notes.trim() ? { notes: notes.trim() } : {}),
+      // Checkout is what calls `POST /bookings`, so the chosen trainer has to
+      // survive the hand-off. Dropped here, the customer would pick a trainer,
+      // see only that trainer's times, and then be auto-assigned somebody else.
+      ...(trainerId ? { trainer: trainerId } : {}),
     });
 
     router.push(`/checkout?${query}`);
-  }, [service, addressId, slot, date, goal, level, notes, router]);
+  }, [service, addressId, slot, date, goal, level, notes, trainerId, router]);
 
   return (
     <div className="layout">
       <div className="booking-main">
+        {trainerId ? <ChosenTrainer trainerId={trainerId} /> : null}
+
         <section className="panel" id="servicePanel">
           <div className="panel-head">
             <span className="panel-icon">✳</span>

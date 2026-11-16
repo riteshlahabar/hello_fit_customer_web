@@ -66,7 +66,7 @@ const ACCOUNT_LINKS: string[][] = [
 ];
 
 export function AvatarMenu() {
-  const { name, initials, signedIn } = useIdentity();
+  const { name, initials, signedIn, ready } = useIdentity();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -103,6 +103,20 @@ export function AvatarMenu() {
     router.replace('/login');
     router.refresh();
   }
+
+  // A visitor who is known to be signed out gets no avatar. The circle used to
+  // sit beside Log in / Get Started showing the `—` placeholder initials, and
+  // its only menu item was a second "Log in" duplicating the button next to it.
+  //
+  // The gate is `ready`, not `signedIn`, and that distinction is the whole
+  // point. Both the server render and the first client render report
+  // `signedIn: false` because identity lives in localStorage, so gating on
+  // `signedIn` would drop the avatar from the server HTML of all fourteen
+  // signed-in pages — the regression smoke:web-logout exists to catch. `ready`
+  // is false through both of those renders, so the markup is unchanged until
+  // the browser has actually decided, then the avatar disappears for visitors
+  // and stays for customers.
+  if (ready && !signedIn) return null;
 
   return (
     <div ref={wrap} style={{ position: 'relative' }}>

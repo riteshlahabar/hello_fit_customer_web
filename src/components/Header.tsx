@@ -67,16 +67,19 @@ export function Header() {
 
         <div className="nav-actions">
           {/*
-            The avatar is rendered **unconditionally**, which is not an
-            oversight.
+            The avatar is still mounted **unconditionally here**, which is not
+            an oversight — do not wrap it in a `signedIn` check.
 
             `useIdentity` only knows who you are in the browser, so a
             `signedIn ? <AvatarMenu/> : …` gate puts no avatar in the server
             HTML at all — and logout lives in that menu (client instruction,
             12 Nov 2026). The first version of this file did exactly that and
-            smoke:web-logout failed on all 14 signed-in pages. The thirteen
-            inline headers it replaces rendered it unconditionally too;
-            AvatarMenu itself offers Log in or Log out as appropriate.
+            smoke:web-logout failed on all 14 signed-in pages.
+
+            Hiding it from visitors is AvatarMenu's own job, and it is done
+            there on `ready && !signedIn` so the server markup is untouched.
+            See the note above its early return for why the flag has to be
+            `ready` rather than `signedIn`.
 
             The two buttons are the signed-out state of the demo's homepage
             header, so they go when there is someone to greet.

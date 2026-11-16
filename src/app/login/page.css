@@ -90,3 +90,27 @@
 [data-hf-page="login"] .social button {font-size:10px}
 [data-hf-page="login"] .rowline {align-items:flex-start}
 }
+
+/* ---------------------------------------------------------------------------
+ * Ours, not the client's. Everything above this line is their stylesheet.
+ *
+ * The demo puts `.text-link` on an <a> and nowhere else — "Forgot password?",
+ * "Terms of Service", "Privacy Policy" — so the rule it wrote
+ * (`color:var(--orange);font-weight:700`) never had to undo button chrome.
+ *
+ * Three of those links are tab switches here, not navigations, so they are
+ * <button> and must stay <button> for the keyboard and the screen reader:
+ * "Use email and password instead", "Create an account", "Send again". Each
+ * was therefore drawing the browser's default grey box around the text.
+ *
+ * `font` and `cursor` are already handled for every button on this page by the
+ * client's own reset near the top, so three properties are the whole fix. The
+ * demo does exactly this for `.show-pass`, its one other text-styled button.
+ */
+[data-hf-page="login"] button.text-link {border:0;background:none;padding:0}
+
+/* The one tab switch that is not already inside a centred block — "Create an
+ * account" sits in the demo's `.footer-note`, which centres it, and this had
+ * nothing. `margin-top` matches the `.legal` rhythm above it so the centred
+ * line does not sit flush against the form. */
+[data-hf-page="login"] .switch-link {text-align:center;margin-top:14px}

@@ -92,10 +92,15 @@ export function AuthPanel() {
       <LoginForm hidden={tab !== 'login'} onMessage={show} />
       <RegisterForm hidden={tab !== 'register'} onMessage={show} />
 
+      {/* Centred to sit on the same axis as the "Create an account" line below
+          it. The button is inline-block, so the wrapper's `text-align` is what
+          does it — no `display` change, which would alter the box itself. */}
       {tab === 'login' ? null : (
-        <button type="button" className="text-link" onClick={() => pick('login')}>
-          Use email and password instead
-        </button>
+        <div className="switch-link">
+          <button type="button" className="text-link" onClick={() => pick('login')}>
+            Use email and password instead
+          </button>
+        </div>
       )}
 
       <div className="footer-note">

@@ -28,6 +28,18 @@ export interface Identity {
   completed: string;
   /** False until the fetch resolves, so the menu can offer Log in instead. */
   signedIn: boolean;
+  /**
+   * Whether `signedIn` is an answer or merely the not-yet-known default.
+   *
+   * The server render and the first client render both read `signedIn` as
+   * false, which is why the avatar cannot be gated on it alone — a
+   * `signedIn ? … : null` strips the avatar from the server HTML of every
+   * signed-in page, which is exactly what smoke:web-logout catches. `ready`
+   * stays false through both of those renders and flips once `load()` has
+   * actually decided, so a consumer can tell "nobody is signed in" apart from
+   * "nobody has looked yet".
+   */
+  ready: boolean;
 }
 
 const EMPTY: Identity = {
@@ -36,6 +48,7 @@ const EMPTY: Identity = {
   total: UNKNOWN,
   completed: UNKNOWN,
   signedIn: false,
+  ready: false,
 };
 
 /** `Aarohi Rao` → `AR`; `Aarohi` → `A`. Matches the demo's own initials. */
@@ -58,7 +71,7 @@ async function load() {
   // No token means no request at all: the API would 401 and the page would
   // log a failure for something that is simply "nobody is signed in".
   if (!isSignedIn()) {
-    publish({ ...EMPTY, signedIn: false });
+    publish({ ...EMPTY, signedIn: false, ready: true });
     return;
   }
 
@@ -76,6 +89,7 @@ async function load() {
     total: String(rows.length),
     completed: String(rows.filter((b) => b.status === 'completed').length),
     signedIn: !profile.unauthorised,
+    ready: true,
   });
 }
 
@@ -90,7 +104,9 @@ function ensureLoaded() {
 /** Drop the cache after signing out, so the next read is not a stale name. */
 export function forgetIdentity() {
   cache = null;
-  publish({ ...EMPTY, signedIn: false });
+  // `ready: true` — a logout is an answer, not an absence of one, so the
+  // avatar must go straight away rather than linger until something reloads.
+  publish({ ...EMPTY, signedIn: false, ready: true });
 }
 
 /**

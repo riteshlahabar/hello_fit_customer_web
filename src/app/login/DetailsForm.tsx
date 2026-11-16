@@ -14,6 +14,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { refreshIdentity } from '@/lib/identity';
 import { saveProfile, splitName, type ProfileForm } from '@/lib/profile';
 
 /** Blank everything the details step does not ask for. */
@@ -70,6 +71,9 @@ export function DetailsForm({
       onMessage(result.message ?? 'Could not save your details. Try again.', true);
       return;
     }
+
+    // The name was blank a moment ago and the identity cache still says so.
+    refreshIdentity();
 
     onMessage('Account created. Taking you to your dashboard…');
     router.push('/dashboard');

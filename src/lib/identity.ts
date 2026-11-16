@@ -101,6 +101,25 @@ function ensureLoaded() {
   });
 }
 
+/**
+ * Read again after signing in, discarding whatever is cached.
+ *
+ * **Without this the name only appeared after a manual refresh.** The login
+ * page's own header asks for the identity, gets "nobody is signed in" and
+ * caches it. Signing in then navigates client-side, so the module is never
+ * re-evaluated and `ensureLoaded`'s `if (cache) return` hands the dashboard
+ * that same signed-out answer — a dash where the name should be. Only a full
+ * reload cleared it.
+ *
+ * The cache is replaced rather than nulled first, so the name does not blink
+ * through `—` on the way.
+ */
+export function refreshIdentity(): void {
+  inFlight = load().finally(() => {
+    inFlight = null;
+  });
+}
+
 /** Drop the cache after signing out, so the next read is not a stale name. */
 export function forgetIdentity() {
   cache = null;

@@ -18,13 +18,41 @@
 // A dash is the honest answer for "we do not know this yet". Inventing a
 // number, or deleting the client's tile, would both be worse.
 
+import { useSyncExternalStore } from 'react';
+import {
+  GREETINGS,
+  greetingBand,
+  SERVER_GREETING_BAND,
+} from '@/lib/greeting';
 import { UNKNOWN, useIdentity } from '@/lib/identity';
 
+/**
+ * The band changes only when the hour does, which no page view outlives in a
+ * way worth re-rendering for. Subscribing to nothing keeps the snapshot honest
+ * without a timer.
+ */
+const NO_CHANGES = () => () => {};
+
 export function LiveGreeting() {
-  // The demo's wording and the sun, kept; only the name is live.
+  // The demo said "Good morning ☀️" at every hour of the day. It now follows
+  // the reader's clock — `lib/greeting.ts` holds the bands so any other
+  // surface greets identically.
+  //
+  // `useSyncExternalStore` rather than `useState` + `useEffect`: the clock is
+  // outside React, the server cannot know the reader's hour, and this is the
+  // API that lets the server render one value and the client correct it
+  // without a hydration warning. The snapshot is a *number* on purpose —
+  // returning a fresh `{ text, icon }` each render would never settle.
+  const band = useSyncExternalStore(
+    NO_CHANGES,
+    () => greetingBand(),
+    () => SERVER_GREETING_BAND,
+  );
+  const { text, icon } = GREETINGS[band]!;
+
   return (
     <h1>
-      Good morning, {useIdentity().name} <span>☀️</span>
+      {text}, {useIdentity().name} <span>{icon}</span>
     </h1>
   );
 }

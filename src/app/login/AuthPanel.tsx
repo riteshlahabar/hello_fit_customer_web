@@ -27,6 +27,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { refreshIdentity } from '@/lib/identity';
 import { loadProfile } from '@/lib/profile';
 import { DetailsForm } from './DetailsForm';
 import { OtpForm } from './OtpForm';
@@ -64,6 +65,11 @@ export function AuthPanel() {
       setNeedsDetails(mobile);
       return;
     }
+
+    // The header on this very page already cached "nobody is signed in". The
+    // push below is client-side, so without this the dashboard would read that
+    // stale answer and show a dash until a manual refresh.
+    refreshIdentity();
 
     show('Signed in. Taking you to your dashboard…');
     router.push('/dashboard');

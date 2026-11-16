@@ -48,19 +48,14 @@ const columns: { heading: string; links: FooterLink[] }[] = [
   {
     heading: 'Support',
     links: [
-      { href: '/help', label: 'Help & support' },
-      { href: '/support-tickets', label: 'Contact us' },
-      { href: '/refunds', label: 'Refunds & cancellations' },
-    ],
-  },
-  {
-    heading: 'Good to know',
-    links: [
       { href: '/#about-hellofit', label: 'About us', section: true },
+      { href: '/support-tickets', label: 'Contact us' },          
+      { href: '/refunds', label: 'Refunds & cancellations' },      
       { href: '/privacy-policy', label: 'Privacy policy' },
       { href: '/terms-conditions', label: 'Terms & conditions' },
+      { href: '/help', label: 'Help & support' },
     ],
-  },
+  },  
 ];
 
 export function Footer() {

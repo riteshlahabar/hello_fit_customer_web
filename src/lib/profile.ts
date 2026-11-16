@@ -70,8 +70,14 @@ export interface ProfileLoad {
   error?: string;
 }
 
-/** `Aarohi Rao` → `['Aarohi', 'Rao']`; `Aarohi` → `['Aarohi', '']`. */
-function splitName(name: string): [string, string] {
+/**
+ * `Aarohi Rao` → `['Aarohi', 'Rao']`; `Aarohi` → `['Aarohi', '']`.
+ *
+ * Exported for the login page's details step, which asks for one "Full name"
+ * rather than two boxes. Splitting there instead of stuffing everything into
+ * `firstName` means `/profile` shows the two halves the way it always has.
+ */
+export function splitName(name: string): [string, string] {
   const trimmed = name.trim();
   const cut = trimmed.lastIndexOf(' ');
   return cut === -1 ? [trimmed, ''] : [trimmed.slice(0, cut), trimmed.slice(cut + 1)];

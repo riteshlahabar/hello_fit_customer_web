@@ -1,29 +1,72 @@
 'use client';
 
-// The demo's `section.auth-wrap`, with its tabs actually switching.
+// The demo's `section.auth-wrap`, reduced to the one door that exists.
 //
-// The demo drove these from an inline `<script>` that the parse5 conversion
-// dropped, which is why every button on this page did nothing. Same markup,
-// same ids and classes — the behaviour is React now.
+// **OTP is the only way in** (client, 16 Nov 2026). Verifying a code on an
+// unknown mobile *is* registration — `auth.service.ts:136` creates the user with
+// the CUSTOMER role right there — so a separate "Create account" was a second
+// name for the same door. The client's call was to drop it rather than build a
+// registration flow behind it.
 //
-// Three doors, one of which works: OTP. See `StaticForms.tsx` for why the
-// other two are kept but unwired.
+// Removed on that instruction: the Create account tab, Continue with Google,
+// "Use email and password instead", and the "New to HelloFit? Create an
+// account" footer line.
+//
+// **Two more went because the removals left them meaningless**, and both are
+// one line to restore if that was wrong:
+//
+//  - the `.social` row. Its other button, "Continue with OTP", only switched to
+//    the tab the page now always shows, so it did nothing — and alone in a
+//    two-column grid it rendered half-width.
+//  - the `.divider`. It read "OR SIGN IN WITH A PASSWORD", and there is no
+//    longer a password to sign in with.
+//
+// With one door left there is no tab state, so the heading and subtitle are
+// plain text rather than branches. `StaticForms.tsx` is now unrendered and kept
+// on disk, not deleted, the same way `Language.tsx` was parked.
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { loadProfile } from '@/lib/profile';
+import { DetailsForm } from './DetailsForm';
 import { OtpForm } from './OtpForm';
-import { LoginForm, RegisterForm } from './StaticForms';
-
-type Tab = 'login' | 'register' | 'otp';
 
 export function AuthPanel() {
-  const [tab, setTab] = useState<Tab>('otp');
-  const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(null);
+  const router = useRouter();
+  const [message, setMessage] = useState<{ text: string; bad: boolean } | null>(
+    null,
+  );
+  const [needsDetails, setNeedsDetails] = useState<string | null>(null);
 
   const show = (text: string, bad = false) => setMessage({ text, bad });
 
-  const pick = (next: Tab) => {
-    setTab(next);
-    setMessage(null);
+  /**
+   * Where a verified code lands: the dashboard, or the details step first.
+   *
+   * **The test is an empty name, not the API's `isNewAccount` flag.** That flag
+   * is true only on the very first verify, so someone who verified once and
+   * closed the tab would be `isNewAccount: false` for ever after and would slip
+   * past with a blank profile. An empty name catches both.
+   *
+   * A profile that fails to load is not a reason to trap someone on the login
+   * page, so anything unexpected falls through to the dashboard.
+   */
+  const afterVerify = async (mobile: string) => {
+    show('Verified. Checking your account…');
+
+    const profile = await loadProfile();
+    const named = Boolean(
+      profile.form && (profile.form.firstName || profile.form.lastName),
+    );
+
+    if (profile.form && !named) {
+      show('Almost there — tell us who you are.');
+      setNeedsDetails(mobile);
+      return;
+    }
+
+    show('Signed in. Taking you to your dashboard…');
+    router.push('/dashboard');
   };
 
   return (
@@ -31,32 +74,13 @@ export function AuthPanel() {
       <div className="auth-head">
         <div className="eyebrow">WELCOME TO HELLOFIT</div>
         <h2 id="authTitle">
-          {tab === 'register' ? 'Create your account.' : 'Good to see you again.'}
+          {needsDetails ? 'Create your account.' : 'Good to see you again.'}
         </h2>
         <p id="authSubtitle">
-          {tab === 'register'
-            ? 'Verify your mobile and your account is ready.'
+          {needsDetails
+            ? 'Your mobile is verified. Just your name and email and you are in.'
             : 'Sign in to manage your sessions and keep your progress moving.'}
         </p>
-      </div>
-
-      <div className="tabs" role="tablist">
-        <button
-          className={`tab${tab !== 'register' ? ' active' : ''}`}
-          id="loginTab"
-          role="tab"
-          aria-selected={tab !== 'register'}
-          onClick={() => pick('otp')}>
-          Sign in
-        </button>
-        <button
-          className={`tab${tab === 'register' ? ' active' : ''}`}
-          id="registerTab"
-          role="tab"
-          aria-selected={tab === 'register'}
-          onClick={() => pick('register')}>
-          Create account
-        </button>
       </div>
 
       {/* `.message` is `display:none` until it also carries `show`
@@ -72,43 +96,11 @@ export function AuthPanel() {
         {message?.text ?? ''}
       </div>
 
-      <div className="social">
-        <button
-          type="button"
-          id="googleBtn"
-          onClick={() => show('Google sign-in isn’t available yet.', true)}>
-          <span className="google-g">G</span>Continue with Google
-        </button>
-        <button type="button" id="otpBtn" onClick={() => pick('otp')}>
-          ✉ &nbsp; Continue with OTP
-        </button>
-      </div>
-
-      <div className="divider">
-        {tab === 'otp' ? 'OR SIGN IN WITH A PASSWORD' : 'OR CONTINUE WITH EMAIL'}
-      </div>
-
-      {tab === 'otp' ? <OtpForm onMessage={show} /> : null}
-      <LoginForm hidden={tab !== 'login'} onMessage={show} />
-      <RegisterForm hidden={tab !== 'register'} onMessage={show} />
-
-      {/* Centred to sit on the same axis as the "Create an account" line below
-          it. The button is inline-block, so the wrapper's `text-align` is what
-          does it — no `display` change, which would alter the box itself. */}
-      {tab === 'login' ? null : (
-        <div className="switch-link">
-          <button type="button" className="text-link" onClick={() => pick('login')}>
-            Use email and password instead
-          </button>
-        </div>
+      {needsDetails ? (
+        <DetailsForm mobile={needsDetails} onMessage={show} />
+      ) : (
+        <OtpForm onMessage={show} onVerified={(mobile) => void afterVerify(mobile)} />
       )}
-
-      <div className="footer-note">
-        New to HelloFit?{' '}
-        <button type="button" className="text-link" onClick={() => pick('register')}>
-          Create an account
-        </button>
-      </div>
     </section>
   );
 }

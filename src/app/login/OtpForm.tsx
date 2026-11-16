@@ -16,13 +16,18 @@
 // sent now.
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { normaliseMobile, OTP_LENGTH, sendOtp, verifyOtp } from '@/lib/auth';
 
 type Stage = 'mobile' | 'code';
 
-export function OtpForm({ onMessage }: { onMessage: (text: string, bad?: boolean) => void }) {
-  const router = useRouter();
+export function OtpForm({
+  onMessage,
+  onVerified,
+}: {
+  onMessage: (text: string, bad?: boolean) => void;
+  /** Called with the normalised mobile once the code checks out. */
+  onVerified: (mobile: string) => void;
+}) {
   const [stage, setStage] = useState<Stage>('mobile');
   const [mobile, setMobile] = useState('');
   const [code, setCode] = useState('');
@@ -73,8 +78,11 @@ export function OtpForm({ onMessage }: { onMessage: (text: string, bad?: boolean
       return;
     }
 
-    onMessage('Signed in. Taking you to your dashboard…');
-    router.push('/dashboard');
+    // **Not a redirect any more.** Whether this lands on the dashboard or on
+    // the details step depends on whether the account has a name yet, and that
+    // needs a profile read. `AuthPanel` owns that decision so this form stays
+    // about one thing. Client's instruction, 16 Nov 2026.
+    onVerified(normalised);
   };
 
   return (
@@ -113,7 +121,10 @@ export function OtpForm({ onMessage }: { onMessage: (text: string, bad?: boolean
       </div>
 
       <button className="submit" type="submit" id="otpSubmit" disabled={busy}>
-        {stage === 'mobile' ? 'SEND ONE-TIME CODE   →' : 'VERIFY AND SIGN IN   →'}
+        {/* "Send OTP" on the client's instruction, 16 Nov 2026. Kept in caps
+            to match VERIFY AND SIGN IN beside it — the demo writes both
+            literally uppercase, the stylesheet does not transform them. */}
+        {stage === 'mobile' ? 'SEND OTP   →' : 'VERIFY AND SIGN IN   →'}
       </button>
 
       {stage === 'code' ? (

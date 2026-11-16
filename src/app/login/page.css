@@ -109,8 +109,7 @@
  */
 [data-hf-page="login"] button.text-link {border:0;background:none;padding:0}
 
-/* The one tab switch that is not already inside a centred block — "Create an
- * account" sits in the demo's `.footer-note`, which centres it, and this had
- * nothing. `margin-top` matches the `.legal` rhythm above it so the centred
- * line does not sit flush against the form. */
-[data-hf-page="login"] .switch-link {text-align:center;margin-top:14px}
+/* `.switch-link` lived here from 16 Nov to centre "Use email and password
+ * instead". The client removed that link the same day, so the rule went with
+ * it rather than linger as dead CSS. The `button.text-link` reset above stays:
+ * OtpForm's "Send again" still uses it. */

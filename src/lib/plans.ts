@@ -33,9 +33,28 @@ export interface Plan {
   features: PlanFeature[];
 }
 
-/** Cached five minutes: plans change when an administrator edits them. */
+/**
+ * Read live on every request — **not** cached.
+ *
+ * This used to take the 300-second default, which made `/plans` a build-time
+ * snapshot refreshed every five minutes. On a live server that reads as broken:
+ * an administrator changes a price, reloads the page and sees the old one, and
+ * because Next serves stale-while-revalidate the *first* visit after the window
+ * still shows the old page and only triggers the rebuild — the new price
+ * appears on the visit after that. Measured on the VPS, 16 Nov 2026:
+ * `x-nextjs-cache: HIT`, `s-maxage=300, stale-while-revalidate=31535700`.
+ *
+ * A price is a commitment, so it is the one thing on this site that must never
+ * be served stale. `revalidate: 0` makes the fetch `cache: 'no-store'` and the
+ * route dynamic. The cost is one API call per visit for three rows, on a page
+ * nobody hammers.
+ *
+ * The 300-second default still applies to the catalog and the provider filters
+ * (`catalog.ts`, `provider-filters.ts`) — deliberately. Those are large, change
+ * rarely and are not promises to a customer.
+ */
 export async function listPlans(): Promise<Plan[]> {
-  return (await apiGet<Plan[]>('/plans')) ?? [];
+  return (await apiGet<Plan[]>('/plans', { revalidate: 0 })) ?? [];
 }
 
 /**

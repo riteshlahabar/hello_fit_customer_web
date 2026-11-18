@@ -41,9 +41,10 @@ export default async function PackagesPage({
   const services = await getServices(undefined, 0);
   const picked = slug ? services.find((row) => row.slug === slug) : undefined;
 
-  // Server-rendered so the cards are never briefly empty. Without a service
-  // the packages carry terms and no price — the rate belongs to the service.
-  const packages = await listPackages(picked?.id);
+  // Server-rendered so the cards are never briefly empty. No service picked
+  // means no cards at all (client, 18 Nov 2026), so there is nothing to
+  // fetch either.
+  const packages = picked ? await listPackages(picked.id) : [];
 
   return (
     <div data-hf-page="packages">
@@ -77,13 +78,14 @@ export default async function PackagesPage({
 
         <ServicePicker services={services} selected={picked?.slug} />
 
-        <PackageCards packages={packages} serviceName={picked?.name} />
-
-        <div className="trial-note">
-          Each package adjusts the price of the service you book, so the final
-          amount depends on the trainer and service you choose. The exact total
-          is shown before you confirm.
-        </div>
+        {picked ? (
+          <PackageCards packages={packages} serviceName={picked.name} />
+        ) : (
+          // Client, 18 Nov 2026: cards stay hidden until a service is picked.
+          <p className="pick-first">
+            Choose a service above — packages and pricing appear once you do.
+          </p>
+        )}
 
         <section className="section-title">
           <h2>More than a package</h2>

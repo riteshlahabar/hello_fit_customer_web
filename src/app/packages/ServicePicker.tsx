@@ -8,8 +8,10 @@
 // page stays server-rendered with real prices, the choice survives a reload
 // and a priced page can be shared as a link.
 //
-// Group services are filtered out by the page: `GET /packages?serviceId=` of
-// a group service answers with an empty list, because a group prices by slab.
+// Nothing is selected until the visitor picks (client, 18 Nov 2026): the old
+// "terms only" option is gone and the page shows a prompt in place of the
+// cards, because a package without a service shows no money and reads as if
+// the price were missing.
 
 import { useRouter } from 'next/navigation';
 import type { ApiService } from '@/lib/catalog';
@@ -27,7 +29,7 @@ export function ServicePicker({
 
   return (
     <div className="service-picker">
-      <label htmlFor="package-service">See prices for</label>
+      <label htmlFor="package-service">Choose your service</label>
 
       <select
         id="package-service"
@@ -37,7 +39,9 @@ export function ServicePicker({
           router.push(slug ? `/packages?service=${slug}` : '/packages');
         }}
       >
-        <option value="">Terms only — no service picked</option>
+        <option value="" disabled>
+          Select a service…
+        </option>
         {services.map((service) => (
           <option key={service.id} value={service.slug}>
             {service.name}

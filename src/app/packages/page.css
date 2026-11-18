@@ -41,15 +41,28 @@
 [data-hf-page="packages"] .plan {background:#fff;border:1px solid var(--line);border-radius:22px;padding:25px 23px 22px;position:relative;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
 [data-hf-page="packages"] .plan.featured {border:2px solid var(--orange);transform:translateY(-7px)}
 [data-hf-page="packages"] .popular {position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;border-radius:99px;padding:7px 14px;font-size:9px;font-weight:800;white-space:nowrap;letter-spacing:.6px}
-[data-hf-page="packages"] .plan-head {display:flex;align-items:center;justify-content:space-between;gap:10px}
-[data-hf-page="packages"] .plan-icon {width:43px;height:43px;border-radius:13px;background:#fff0e8;display:grid;place-items:center;font-size:21px}
-[data-hf-page="packages"] .plan h3 {font-size:17px;margin:17px 0 5px}
+/* The name sits on the icon's row, after it (client, 18 Nov 2026), so
+   `flex-start` rather than the demo's `space-between` — that pushed the name
+   to the far edge, away from the mark it belongs to. The demo's second head
+   element, which `space-between` was for, is the `.popular` ribbon, and that
+   is absolutely positioned. `min-width:0` lets a long name ellipsis rather
+   than widen the card. */
+[data-hf-page="packages"] .plan-head {display:flex;align-items:center;justify-content:flex-start;gap:11px}
+[data-hf-page="packages"] .plan-icon {width:43px;height:43px;border-radius:13px;background:#fff0e8;display:grid;place-items:center;font-size:21px;flex:0 0 auto}
+/* 17px -> 20px (client, 18 Nov 2026). The name is the card's title and now
+   shares the icon's row, where 17px sat under the 43px mark beside it. */
+[data-hf-page="packages"] .plan h3 {font-size:20px;margin:0;line-height:1.25;min-width:0}
 [data-hf-page="packages"] .plan-desc {font-size:11px;color:var(--muted);min-height:38px;line-height:1.7}
 [data-hf-page="packages"] .price {display:flex;align-items:baseline;gap:5px;margin:20px 0 3px}
 [data-hf-page="packages"] .currency {font-size:16px;font-weight:700}
 [data-hf-page="packages"] .amount {font-family:Anton,sans-serif;font-size:42px;line-height:1}
-[data-hf-page="packages"] .period {font-size:10px;color:#8c847c}
-[data-hf-page="packages"] .billing-caption {font-size:10px;color:#9b9289;min-height:18px}
+/* 10px -> 12px (client, 18 Nov 2026): these three lines carry the whole
+   explanation of the money above them — the session count, the per-session
+   rate against the service's base rate, and which service it was priced for —
+   and at 10px they read as legal small print. `min-height` follows so the
+   cards keep aligning row to row. */
+[data-hf-page="packages"] .period {font-size:12px;color:#8c847c}
+[data-hf-page="packages"] .billing-caption {font-size:12px;color:#9b9289;min-height:20px;line-height:1.5}
 [data-hf-page="packages"] .divider {height:1px;background:#f0e9e1;margin:20px 0}
 [data-hf-page="packages"] .includes {font-size:10px;font-weight:800;margin-bottom:13px}
 [data-hf-page="packages"] .features {list-style:none;padding:0;margin:0 0 22px;display:grid;gap:12px;flex:1}

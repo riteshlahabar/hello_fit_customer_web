@@ -79,7 +79,13 @@ export default async function PackagesPage({
         <ServicePicker services={services} selected={picked?.slug} />
 
         {picked ? (
-          <PackageCards packages={packages} serviceName={picked.name} />
+          <PackageCards
+            packages={packages}
+            serviceName={picked.name}
+            // The rate the percent was applied to, stated on the card
+            // (client, 18 Nov 2026). `basePrice` arrives as a decimal string.
+            serviceBasePrice={Number(picked.basePrice)}
+          />
         ) : (
           // Client, 18 Nov 2026: cards stay hidden until a service is picked.
           <p className="pick-first">

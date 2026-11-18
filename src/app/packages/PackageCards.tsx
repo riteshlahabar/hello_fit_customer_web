@@ -23,66 +23,24 @@
 
 import { useRouter } from 'next/navigation';
 import type { Package } from '@/lib/packages';
-
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-/** Signed, and the sign is the whole meaning — +20 costs more, -15 less. */
-function adjustment(percent: number): string {
-  if (percent === 0) return 'Standard session rate';
-  if (percent < 0) return `${Math.abs(percent)}% off the session rate`;
-  return `${percent}% above the session rate`;
-}
-
-function weekdays(days: number[]): string {
-  if (days.length === 0) return 'Any day of the week';
-  return days.map((day) => DAYS[day] ?? day).join(', ');
-}
-
-const plural = (count: number) => (count === 1 ? 'session' : 'sessions');
-
-/** Whole rupees — a package total never lands on paise worth showing. */
-const rupees = (amount: number) =>
-  `₹${Math.round(amount).toLocaleString('en-IN')}`;
-
-/** The four facts a package states. `included` only picks the ✓ or the –. */
-function terms(pack: Package): { label: string; included: boolean }[] {
-  return [
-    {
-      label: `${pack.sessionCount} paid ${plural(pack.sessionCount)}`,
-      included: true,
-    },
-    ...(pack.freeSessionCount > 0
-      ? [
-          {
-            label: `${pack.freeSessionCount} free ${plural(pack.freeSessionCount)} on top`,
-            included: true,
-          },
-        ]
-      : []),
-    ...(pack.persons > 1
-      ? [{ label: `For ${pack.persons} people per session`, included: true }]
-      : []),
-    { label: `Valid for ${pack.validityDays} days`, included: true },
-    {
-      label: weekdays(pack.allowedWeekdays),
-      included: pack.allowedWeekdays.length === 0,
-    },
-    {
-      label: pack.fixedInstructorAllowed
-        ? 'Keep the same trainer throughout'
-        : 'Trainer may vary between sessions',
-      included: pack.fixedInstructorAllowed,
-    },
-  ];
-}
+import { caption, plural, rupees, terms } from './package-card.text';
 
 export function PackageCards({
   packages,
   serviceName,
+  serviceBasePrice,
 }: {
   packages: Package[];
   /** Set once a service is picked — the rate the percent was applied to. */
   serviceName?: string;
+  /**
+   * That service's own per-session rate, before the package's percent
+   * (client, 18 Nov 2026) — and the only rate on the caption line, which now
+   * reads "₹800 base rate · 20% above the session rate". The per-session
+   * figure that led it was dropped the same day: on a one-session package it
+   * repeated the total printed above it.
+   */
+  serviceBasePrice?: number;
 }) {
   const router = useRouter();
 
@@ -100,11 +58,12 @@ export function PackageCards({
     <section className="plans" id="packages">
       {packages.map((pack) => (
         <article className="plan" data-plan={pack.name} key={pack.id}>
+          {/* Name on the icon's row, after the mark (client, 18 Nov 2026) —
+              it was on a line of its own below. */}
           <div className="plan-head">
             <div className="plan-icon">{pack.icon ?? '◆'}</div>
+            <h3>{pack.name}</h3>
           </div>
-
-          <h3>{pack.name}</h3>
 
           {/* With a service picked the card leads with the money; without
               one it leads with the session count, because the rupee figure
@@ -126,9 +85,7 @@ export function PackageCards({
           )}
 
           <div className="billing-caption">
-            {pack.perSessionPrice === null
-              ? adjustment(pack.percentAdjust)
-              : `${rupees(pack.perSessionPrice)} per session · ${adjustment(pack.percentAdjust)}`}
+            {caption(pack, serviceBasePrice)}
           </div>
 
           {serviceName ? (

@@ -22,6 +22,8 @@ export interface Package {
   icon: string | null;
   /** Sessions the customer pays for. */
   sessionCount: number;
+  /** People attending each session; above 1 makes it a group package. */
+  persons: number;
   /** Delivered on top, charged to nobody — the trial is 1 + 1. */
   freeSessionCount: number;
   validityDays: number;

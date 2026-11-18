@@ -59,6 +59,9 @@ function terms(pack: Package): { label: string; included: boolean }[] {
           },
         ]
       : []),
+    ...(pack.persons > 1
+      ? [{ label: `For ${pack.persons} people per session`, included: true }]
+      : []),
     { label: `Valid for ${pack.validityDays} days`, included: true },
     {
       label: weekdays(pack.allowedWeekdays),

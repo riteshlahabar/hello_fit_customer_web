@@ -33,9 +33,6 @@ export interface ApiService {
   slug: string;
   durationMin: number;
   basePrice: string;
-  level: string;
-  /** Group services price by slab, so they offer no packages. */
-  allowMultiPerson?: boolean;
   category?: { id: string; name: string; slug: string };
 }
 

@@ -37,12 +37,8 @@ export default async function PackagesPage({
 }) {
   const { service: slug } = await searchParams;
 
-  // Only solo services can be picked: a group service prices by slab and the
-  // endpoint answers it with an empty package list.
   // revalidate 0: a service added in the panel must be pickable at once.
-  const services = (await getServices(undefined, 0)).filter(
-    (row) => !row.allowMultiPerson,
-  );
+  const services = await getServices(undefined, 0);
   const picked = slug ? services.find((row) => row.slug === slug) : undefined;
 
   // Server-rendered so the cards are never briefly empty. Without a service

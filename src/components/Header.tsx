@@ -30,7 +30,7 @@ import { Brand } from './Brand';
 const links = [
   { href: '/', label: 'Home', page: true },
   { href: '#categories', label: 'Explore Fitness', page: false },
-  { href: '/plans', label: 'Plans', page: true },
+  { href: '/packages', label: 'Packages', page: true },
   { href: '/find-a-trainer', label: 'Find a Trainer', page: true },
   { href: '#how', label: 'How It Works', page: false },
   { href: '#about-hellofit', label: 'About Us', page: false },

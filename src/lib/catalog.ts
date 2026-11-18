@@ -34,6 +34,8 @@ export interface ApiService {
   durationMin: number;
   basePrice: string;
   level: string;
+  /** Group services price by slab, so they offer no packages. */
+  allowMultiPerson?: boolean;
   category?: { id: string; name: string; slug: string };
 }
 
@@ -152,8 +154,23 @@ export async function getApiCategories(): Promise<ApiCategory[]> {
   return (await apiGet<ApiCategory[]>('/categories')) ?? [];
 }
 
-/** Services, for the search and category pages. Empty array on failure. */
-export async function getServices(categoryId?: string): Promise<ApiService[]> {
+/**
+ * Services, for the search and category pages. Empty array on failure.
+ *
+ * `revalidate` defaults to the 300-second catalogue cache. The Package page
+ * passes 0: its picker must list a service the moment the admin adds one, or
+ * the link it builds names a slug the server does not yet know and the cards
+ * fall back to terms with no price.
+ */
+export async function getServices(
+  categoryId?: string,
+  revalidate?: number,
+): Promise<ApiService[]> {
   const query = categoryId ? `?categoryId=${encodeURIComponent(categoryId)}` : '';
-  return (await apiGet<ApiService[]>(`/services${query}`)) ?? [];
+  return (
+    (await apiGet<ApiService[]>(
+      `/services${query}`,
+      revalidate === undefined ? undefined : { revalidate },
+    )) ?? []
+  );
 }

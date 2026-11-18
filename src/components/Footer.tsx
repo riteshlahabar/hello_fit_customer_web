@@ -32,7 +32,7 @@ const columns: { heading: string; links: FooterLink[] }[] = [
       { href: '/', label: 'Home' },
       { href: '/#categories', label: 'Fitness categories', section: true },
       { href: '/find-a-trainer', label: 'Find a trainer' },
-      { href: '/plans', label: 'Plans' },
+      { href: '/packages', label: 'Packages' },
       { href: '/#how', label: 'How it works', section: true },
     ],
   },

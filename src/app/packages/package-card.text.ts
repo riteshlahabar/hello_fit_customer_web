@@ -40,10 +40,12 @@ export const rupees = (amount: number) =>
  * The line under the price: the service's own rate before the package touched
  * it, and the adjustment applied to it (client, 18 Nov 2026).
  *
- * **The per-session figure came off this line the same day.** It read
- * "₹960 per session", which on a one-session package simply repeated the ₹960
- * printed above it; the rate worth stating here is the one the percent was
- * applied *to*. `Package.perSessionPrice` is still returned by the API and
+ * **The figure here is the service's base rate, worded "per session"**
+ * (client, 18 Nov 2026). The line used to lead with `perSessionPrice` — the
+ * rate *after* the percent — which on a one-session package simply repeated
+ * the total printed above it. That came off; the wording stayed, because
+ * "₹800 per session" is what a customer reads and "base rate" is our word for
+ * it, not theirs. `Package.perSessionPrice` is still returned by the API and
  * still used where the customer actually pays — it is only off this card.
  *
  * Built as parts and joined, so a missing piece drops out instead of leaving a
@@ -59,8 +61,8 @@ export function caption(pack: Package, basePrice?: number): string {
   if (basePrice !== undefined) {
     parts.push(
       pack.persons > 1
-        ? `${rupees(basePrice)} base rate per person`
-        : `${rupees(basePrice)} base rate`,
+        ? `${rupees(basePrice)} per person per session`
+        : `${rupees(basePrice)} per session`,
     );
   }
   parts.push(adjustment(pack.percentAdjust));

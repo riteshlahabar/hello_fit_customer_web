@@ -35,10 +35,10 @@ export function PackageCards({
   serviceName?: string;
   /**
    * That service's own per-session rate, before the package's percent
-   * (client, 18 Nov 2026) — and the only rate on the caption line, which now
-   * reads "₹800 base rate · 20% above the session rate". The per-session
-   * figure that led it was dropped the same day: on a one-session package it
-   * repeated the total printed above it.
+   * (client, 18 Nov 2026) — and the only rate on the caption line, which
+   * reads "₹800 per session · 20% above the session rate". The rate that led
+   * it before was `perSessionPrice`, i.e. after the percent, which on a
+   * one-session package repeated the total printed above it.
    */
   serviceBasePrice?: number;
 }) {

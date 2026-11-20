@@ -17,7 +17,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { SESSION_LABELS } from '@/lib/providers';
 import type { ProviderProfile, ProviderReviewsPayload } from '@/lib/provider-profile';
 import { ProfileReviews } from './ProfileReviews';
 import { minutes, rupees, titleCase } from './bits';
@@ -141,13 +140,6 @@ export function ProfileTabs({
           Times are confirmed on the booking page, against your own address —
           this trainer’s session options and service areas are below.
         </p>
-
-        <h2 style={{ marginTop: '22px' }}>Session options</h2>
-        <div className="specialties">
-          {provider.sessionFormats.map((format) => (
-            <span key={format}>{SESSION_LABELS[format]}</span>
-          ))}
-        </div>
 
         <h2 style={{ marginTop: '22px' }}>Areas served</h2>
         {provider.areas.length === 0 ? (

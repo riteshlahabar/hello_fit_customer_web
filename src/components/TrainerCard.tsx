@@ -17,7 +17,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { SESSION_LABELS, type ProviderCard } from '@/lib/providers';
+import type { ProviderCard } from '@/lib/providers';
 import { SaveHeart } from './trainers/SaveHeart';
 
 const PLACEHOLDER = '/hellofit-logo.png';
@@ -27,7 +27,6 @@ export function TrainerCard({ trainer }: { trainer: ProviderCard }) {
   const role =
     trainer.specialisations[0] ??
     category ??
-    SESSION_LABELS[trainer.sessionFormats[0]] ??
     'Fitness trainer';
 
   return (

@@ -8,7 +8,6 @@
 // keeps the button the design put at the bottom of it.
 
 import Link from 'next/link';
-import { SESSION_LABELS } from '@/lib/providers';
 import type { ProviderProfile } from '@/lib/provider-profile';
 
 export function ProfileSide({
@@ -47,20 +46,6 @@ export function ProfileSide({
             <div>
               <strong>Experience</strong>
               <small>{provider.experienceYears}+ years</small>
-            </div>
-          </div>
-        ) : null}
-
-        {provider.sessionFormats.length ? (
-          <div className="info-line">
-            <span className="info-icon">⌂</span>
-            <div>
-              <strong>Session locations</strong>
-              <small>
-                {provider.sessionFormats
-                  .map((format) => SESSION_LABELS[format])
-                  .join(' · ')}
-              </small>
             </div>
           </div>
         ) : null}

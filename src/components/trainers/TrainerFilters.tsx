@@ -13,7 +13,7 @@
 // policy: `maxPrice` is only sent when the visitor moves it off the maximum,
 // so a provider priced above ₹1500 is never hidden by a filter nobody touched.
 
-import { SESSION_LABELS, SESSION_ORDER, type ProviderFilters } from '@/lib/providers';
+import type { ProviderFilters } from '@/lib/providers';
 
 export interface FilterOption {
   id: string;
@@ -40,17 +40,6 @@ export function TrainerFilters({ filters, categories, cities, onChange, onReset 
       categoryId: current.includes(id)
         ? current.filter((c) => c !== id)
         : [...current, id],
-      page: 1,
-    });
-  };
-
-  const toggleFormat = (format: (typeof SESSION_ORDER)[number]) => {
-    const current = filters.sessionFormat ?? [];
-    onChange({
-      ...filters,
-      sessionFormat: current.includes(format)
-        ? current.filter((f) => f !== format)
-        : [...current, format],
       page: 1,
     });
   };
@@ -99,20 +88,6 @@ export function TrainerFilters({ filters, categories, cities, onChange, onReset 
           </select>
         </div>
       )}
-
-      <div className="filter-group">
-        <h3>Session location</h3>
-        {SESSION_ORDER.map((format) => (
-          <label className="checkline" key={format}>
-            <input
-              type="checkbox"
-              checked={(filters.sessionFormat ?? []).includes(format)}
-              onChange={() => toggleFormat(format)}
-            />{' '}
-            {SESSION_LABELS[format]}
-          </label>
-        ))}
-      </div>
 
       <div className="filter-group">
         <h3>Price per session</h3>

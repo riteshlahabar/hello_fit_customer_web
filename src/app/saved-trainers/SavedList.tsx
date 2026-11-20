@@ -22,7 +22,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { SESSION_LABELS } from '@/lib/providers';
 import type { SavedTrainer } from '@/lib/favourites';
 import { SaveHeart } from '@/components/trainers/SaveHeart';
 
@@ -121,14 +120,6 @@ export function SavedList({
                 {trainer.headline}
               </p>
             ) : null}
-
-            <div className="tags">
-              {trainer.sessionFormats.map((format) => (
-                <span className="tag" key={format}>
-                  {SESSION_LABELS[format]}
-                </span>
-              ))}
-            </div>
 
             <div className="bottom">
               <div>

@@ -19,7 +19,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { SaveHeart } from '@/components/trainers/SaveHeart';
-import { SESSION_LABELS } from '@/lib/providers';
 import type { ProviderProfile } from '@/lib/provider-profile';
 import { rupees, starRow } from './bits';
 
@@ -100,10 +99,6 @@ export function ProfileHero({
             <strong>{provider.services.length}</strong>
             <span>Service{provider.services.length === 1 ? '' : 's'}</span>
           </div>
-          <div>
-            <strong>{provider.sessionFormats.length}</strong>
-            <span>Session options</span>
-          </div>
         </div>
 
         <div className="profile-actions">
@@ -143,12 +138,6 @@ export function ProfileHero({
         <a className="btn dark" href="#services">
           View Services
         </a>
-        <div className="book-note">
-          <span>◷</span>{' '}
-          {provider.sessionFormats
-            .map((format) => SESSION_LABELS[format])
-            .join(' · ') || 'Session options confirmed at booking'}
-        </div>
       </aside>
     </section>
   );

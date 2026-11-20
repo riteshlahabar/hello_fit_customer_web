@@ -8,7 +8,6 @@
 // `fromPrice`, `categories` or `serviceCount`.
 
 import { apiGetResult } from './api';
-import type { SessionFormat } from './providers';
 
 /**
  * One provider's public profile — §5.6. A 404 is returned both for a provider
@@ -27,7 +26,6 @@ export interface ProviderProfile {
   experienceYears: number | null;
   languages: string[];
   specialisations: string[];
-  sessionFormats: SessionFormat[];
   rating: number;
   ratingCount: number;
   services: {

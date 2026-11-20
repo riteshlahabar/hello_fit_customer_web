@@ -12,7 +12,7 @@
 // the people who expect to press something — it is not a no-op, it just has
 // nothing left to do by the time it is clicked.
 
-import { SESSION_LABELS, SESSION_ORDER, type ProviderFilters } from '@/lib/providers';
+import type { ProviderFilters } from '@/lib/providers';
 import type { FilterOption } from './TrainerFilters';
 
 interface Props {
@@ -76,30 +76,6 @@ export function TrainerSearchPanel({ filters, categories, cities, onChange }: Pr
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="field">
-        <span className="sym">◷</span>
-        <select
-          aria-label="Session type"
-          value={filters.sessionFormat?.length === 1 ? filters.sessionFormat[0] : ''}
-          onChange={(e) =>
-            onChange({
-              ...filters,
-              sessionFormat: e.target.value
-                ? [e.target.value as (typeof SESSION_ORDER)[number]]
-                : undefined,
-              page: 1,
-            })
-          }
-        >
-          <option value="">Any session type</option>
-          {SESSION_ORDER.map((format) => (
-            <option key={format} value={format}>
-              {SESSION_LABELS[format]}
             </option>
           ))}
         </select>

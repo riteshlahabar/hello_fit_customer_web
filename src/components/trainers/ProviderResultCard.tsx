@@ -13,7 +13,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { SESSION_LABELS, type ProviderCard } from '@/lib/providers';
+import type { ProviderCard } from '@/lib/providers';
 import { SaveHeart } from './SaveHeart';
 
 const PLACEHOLDER = '/hellofit-logo.png';
@@ -83,12 +83,6 @@ export function ProviderResultCard({
         </div>
 
         {provider.headline ? <p className="trainer-bio">{provider.headline}</p> : null}
-
-        <div className="tags">
-          {provider.sessionFormats.map((format) => (
-            <span key={format}>{SESSION_LABELS[format]}</span>
-          ))}
-        </div>
 
         <div className="card-bottom">
           <div className="price">

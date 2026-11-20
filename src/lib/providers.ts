@@ -13,21 +13,6 @@
 
 import { apiGetResult } from './api';
 
-/** Session location. The demo's wording for each is in `SESSION_LABELS`. */
-export type SessionFormat = 'CUSTOMER_HOME' | 'PROVIDER_LOCATION' | 'ONLINE';
-
-export const SESSION_LABELS: Record<SessionFormat, string> = {
-  CUSTOMER_HOME: 'At my home',
-  PROVIDER_LOCATION: "At trainer's location",
-  ONLINE: 'Online',
-};
-
-export const SESSION_ORDER: SessionFormat[] = [
-  'CUSTOMER_HOME',
-  'PROVIDER_LOCATION',
-  'ONLINE',
-];
-
 /** One card in the results list — the shape `GET /providers` returns. */
 export interface ProviderCard {
   id: string;
@@ -37,7 +22,6 @@ export interface ProviderCard {
   experienceYears: number | null;
   languages: string[];
   specialisations: string[];
-  sessionFormats: SessionFormat[];
   rating: number;
   ratingCount: number;
   /** Cheapest of this provider's approved offerings; null if none priced. */
@@ -63,7 +47,6 @@ export interface ProviderFilters {
   categoryId?: string[];
   cityId?: string;
   areaId?: string;
-  sessionFormat?: SessionFormat[];
   maxPrice?: number;
   minRating?: number;
   sort?: ProviderSort;
@@ -83,9 +66,6 @@ export function toQueryString(filters: ProviderFilters): string {
   if (filters.categoryId?.length) params.set('categoryId', filters.categoryId.join(','));
   if (filters.cityId) params.set('cityId', filters.cityId);
   if (filters.areaId) params.set('areaId', filters.areaId);
-  if (filters.sessionFormat?.length) {
-    params.set('sessionFormat', filters.sessionFormat.join(','));
-  }
   if (typeof filters.maxPrice === 'number') params.set('maxPrice', String(filters.maxPrice));
   if (typeof filters.minRating === 'number' && filters.minRating > 0) {
     params.set('minRating', String(filters.minRating));

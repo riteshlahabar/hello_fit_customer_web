@@ -34,10 +34,14 @@ export function ProfileTabs({
   provider,
   reviews,
   bookHref,
+  serviceHref,
 }: {
   provider: ProviderProfile;
   reviews: ProviderReviewsPayload | null;
   bookHref: string;
+  /** Book *this* service with this trainer — see the page for why it is not
+   * `bookHref` with a service appended. */
+  serviceHref: (serviceId: string) => string;
 }) {
   const [active, setActive] = useState<Tab>('about');
 
@@ -114,7 +118,7 @@ export function ProfileTabs({
                     </p>
                     <Link
                       className="btn outline"
-                      href={`${bookHref}&service=${service.id}`}
+                      href={serviceHref(service.id)}
                     >
                       Choose this service
                     </Link>

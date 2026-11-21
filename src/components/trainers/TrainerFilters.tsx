@@ -32,6 +32,13 @@ interface Props {
   onReset: () => void;
 }
 
+/**
+ * The category group is hidden while the list is narrowed to one service
+ * (client, 21 Nov 2026). The service is the narrower filter and the API
+ * honours it over a category, so the checkboxes would tick and change
+ * nothing — a control that visibly does nothing is worse than no control.
+ */
+
 export function TrainerFilters({ filters, categories, cities, onChange, onReset }: Props) {
   const toggleCategory = (id: string) => {
     const current = filters.categoryId ?? [];
@@ -53,7 +60,7 @@ export function TrainerFilters({ filters, categories, cities, onChange, onReset 
         </button>
       </div>
 
-      {categories.length > 0 && (
+      {categories.length > 0 && !filters.serviceId && (
         <div className="filter-group">
           <h3>Fitness category</h3>
           {categories.map((category) => (

@@ -57,13 +57,20 @@ interface Envelope<T> {
   data?: T;
   meta?: unknown;
   message?: string | null;
-  error?: { code: string; message: string };
+  error?: { code: string; message: string; details?: unknown };
 }
 
 export interface ApiFailure {
   code: string;
   message: string;
   status: number;
+  /**
+   * Whatever the API attached to the refusal. Carried through because some
+   * refusals are a step in the flow rather than a dead end: an address whose
+   * PIN straddles two service areas comes back 400 `AREA_AMBIGUOUS` with the
+   * candidates in here, and the form turns them into a choice.
+   */
+  details?: unknown;
 }
 
 export type ApiOutcome<T> =
@@ -122,6 +129,7 @@ async function request<T>(
           code: envelope.error?.code ?? 'REQUEST_FAILED',
           message: envelope.error?.message ?? `Request failed (${response.status})`,
           status: response.status,
+          details: envelope.error?.details,
         },
       };
     }

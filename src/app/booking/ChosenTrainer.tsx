@@ -1,32 +1,39 @@
 'use client';
 
-// "You chose ‹trainer›" on the booking page — the visible half of `?trainer=`.
+// "Your trainer" in step 1 — the visible half of `?trainer=`.
 //
-// Without it the preselection is invisible: the slot grid quietly shows only
-// one person's times and nothing on the page says whose, so an empty grid
-// reads as "no availability anywhere" rather than "not this trainer, this
-// day". The customer can also drop the choice from here, which is the only
-// way back to auto-assign once the URL carries a trainer.
+// Without it the preselection is invisible: the time grid quietly shows only
+// one person's free times and nothing says whose, so an empty grid reads as
+// "no availability anywhere" rather than "not this trainer, this day".
 //
-// It fetches the name itself rather than taking it through the URL: a name in
-// a query string is a label anyone can edit, and this one sits above a price.
+// **It now shows the photo** (client, 21 Nov 2026) and fetches the provider
+// itself rather than taking a name through the URL — a name in a query string
+// is a label anyone can edit, and this one sits above a price.
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getProvider } from '@/lib/provider-profile';
+import { getProvider, type ProviderProfile } from '@/lib/provider-profile';
+import { TrainerPhoto } from '@/components/TrainerPhoto';
 
-export function ChosenTrainer({ trainerId }: { trainerId: string }) {
-  const [name, setName] = useState<string | null>(null);
+export function ChosenTrainer({
+  trainerId,
+  /** Where "Change trainer" goes — the list, still narrowed to this service. */
+  changeHref,
+}: {
+  trainerId: string;
+  changeHref: string;
+}) {
+  const [provider, setProvider] = useState<ProviderProfile | null>(null);
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     void (async () => {
-      const provider = await getProvider(trainerId);
+      const found = await getProvider(trainerId);
       if (cancelled) return;
 
-      if (provider) setName(provider.name);
+      if (found) setProvider(found);
       else setMissing(true);
     })();
 
@@ -37,36 +44,41 @@ export function ChosenTrainer({ trainerId }: { trainerId: string }) {
 
   if (missing) {
     return (
-      <div className="panel">
-        <p className="muted">
-          That trainer is no longer taking bookings.{' '}
-          <Link href="/find-a-trainer">Choose another trainer</Link> or continue
-          and we will assign one.
-        </p>
-      </div>
+      <p className="muted">
+        That trainer is no longer taking bookings.{' '}
+        <Link href={changeHref}>Choose another trainer</Link>.
+      </p>
     );
   }
 
+  if (!provider) return <p className="muted">Loading your chosen trainer…</p>;
+
+  const rated = provider.ratingCount > 0;
+  const category = provider.services[0]?.category?.name;
+
   return (
-    <div className="panel">
-      <div className="panel-head">
-        <span className="panel-icon">♙</span>
-        <div>
-          <h2>Your trainer</h2>
-          <p>
-            {name
-              ? `${name} — times below are theirs only.`
-              : 'Loading your chosen trainer…'}
-          </p>
-        </div>
+    <div className="chosen-trainer">
+      <div className="chosen-photo">
+        <TrainerPhoto name={provider.name} photoUrl={provider.photoUrl} fill sizes="92px" />
       </div>
-      <p className="muted">
-        <Link href={`/trainer-profile?id=${trainerId}`}>View profile</Link>
-        {' · '}
-        <Link href="/find-a-trainer">Change trainer</Link>
-        {' · '}
-        <Link href="/booking">Let HelloFit choose</Link>
-      </p>
+
+      <div className="chosen-facts">
+        <strong>{provider.name}</strong>
+        <small>
+          {[
+            category ?? provider.specialisations[0] ?? 'Fitness professional',
+            provider.experienceYears ? `${provider.experienceYears} years experience` : null,
+            rated ? `★ ${provider.rating.toFixed(1)} (${provider.ratingCount})` : 'No reviews yet',
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </small>
+        <span className="chosen-links">
+          <Link href={`/trainer-profile?id=${provider.id}`}>View profile</Link>
+          {' · '}
+          <Link href={changeHref}>Change trainer</Link>
+        </span>
+      </div>
     </div>
   );
 }

@@ -1,407 +1,199 @@
 'use client';
 
-// The live booking workflow (PDF §5.7). Everything the demo hard-coded is
-// gone: three sample services at ₹600/₹500/₹450, six fixed November dates,
-// four fixed time buttons, and a ₹600 summary.
+// The live booking workflow (PDF §5.7), reworked on 21 Nov 2026.
 //
-// What each panel is now:
+// **The four steps are now real tabs.** They were a decorative strip with
+// `step active` hard-coded on the first one while all four panels rendered
+// stacked down the page — which is what the client reported as the
+// date-and-time screen appearing inside the choose-service tab. One panel
+// shows at a time, a step opens only once the ones before it are answered,
+// and the strip marks what is done.
 //
-// - **01 Choose service** — `GET /services`, with the real duration and base
-//   price. Goal and level stay as the design draws them and travel with the
-//   booking in its `preferences` column.
-// - **02 Date & time** — `GET /app/customer/slots`, which needs a service, a
-//   day *and* an address, so the address is resolved first and a change to it
-//   re-queries. An empty grid is the backend's answer, not an error.
-// - **03 Location** — the customer's saved addresses, in the design's own
-//   `.location-option` control. The demo's three options were session formats
-//   with no field behind them; the address is the field the booking takes.
-// - **04 Review** — name, email and mobile from the profile, read-only here
-//   because this screen has no mandate to change the account.
+// **The service and the package arrive decided.** `/packages` → trainer list
+// → here, carrying `?service=` and `?package=`, so step 1 states them with
+// the way back to change either rather than asking for a service a second
+// time. The package is what prices the booking: it rides on the quote and on
+// `POST /bookings`, which is the whole of "do not show the base price".
 //
-// **A trainer can be chosen as of 13 Nov 2026 (Phase 5).** `?trainer=<id>`
-// arrives from Find a Trainer, the trainer profile or Saved Trainers; it
-// narrows the slot grid to that person, shows `ChosenTrainer` above the
-// panels so the narrowing is visible, and travels on to checkout, which
-// creates the booking. Without it the booking is auto-assigned exactly as
-// before — PDF §3.6 is a choice, not a requirement.
+// **The customer picks a start, not a range** — the end is the service's own
+// length. See `WhenPanel`.
+//
+// Three files behind this one: `useBookingDraft` holds the raw choices,
+// `useBookingData` does the reading, `resolveDraft` turns the two into what
+// the panels render. This file is the panels.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { getServices } from '@/lib/catalog';
-import type { ApiService } from '@/lib/catalog';
-import { clockOf, getAddresses, getQuote, getSlots, nextDays } from '@/lib/booking';
-import type { Quote, Slot } from '@/lib/booking';
-import { loadProfile } from '@/lib/profile';
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { ApiAddress } from '@/lib/profile';
-import { ChosenTrainer } from './ChosenTrainer';
+import { ServiceStep } from './ServiceStep';
+import { WhenPanel } from './WhenPanel';
+import { WherePanel } from './WherePanel';
+import { ReviewPanel } from './ReviewPanel';
+import { SummaryCard } from './SummaryCard';
+import { StepStrip } from './StepStrip';
+import { useBookingData } from './useBookingData';
+import { useBookingDraft } from './useBookingDraft';
+import { checkoutQuery, resolveDraft } from './resolveDraft';
+import { blockedReason, canReach, type StepNumber } from './steps';
 
-const money = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+const ICONS: Record<StepNumber, string> = { 1: '✳', 2: '▦', 3: '⌖', 4: '✓' };
 
-const ICONS = ['🧘', '🌿', '⌂', '🏋️', '💃', '🤸'];
-
-/** `2026-11-14` → `{ weekday: 'SAT', day: '14', month: 'NOV' }`. */
-function dateParts(iso: string) {
-  const [y, m, d] = iso.split('-').map(Number);
-  const when = new Date(y, m - 1, d);
-  return {
-    weekday: when.toLocaleDateString('en-IN', { weekday: 'short' }).toUpperCase(),
-    day: String(d).padStart(2, '0'),
-    month: when.toLocaleDateString('en-IN', { month: 'short' }).toUpperCase(),
-    long: when.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }),
-  };
-}
+const HEADS: Record<StepNumber, { title: string; blurb: string }> = {
+  1: { title: '01. Your trainer & service', blurb: 'Who you chose, and what you are booking.' },
+  2: { title: '02. Pick a date & start time', blurb: 'The session ends after the service length.' },
+  3: { title: '03. Choose session location', blurb: 'Where your trainer should come.' },
+  4: { title: '04. Review your booking', blurb: 'Double-check before moving to payment.' },
+};
 
 export function BookingWizard() {
   const router = useRouter();
-  const params = useSearchParams();
-  // Set by the homepage hero search, so a visitor who searched for a service
-  // lands on the booking flow with it already chosen.
-  const wantedService = params.get('service') ?? '';
-  /**
-   * `?trainer=<id>` — the trainer the customer chose on Find a Trainer, the
-   * trainer profile or Saved Trainers (PDF §3.6). It narrows the slot grid to
-   * that person's free times and travels on to checkout, which creates the
-   * booking. Absent, nothing changes: the API auto-assigns as before.
-   *
-   * It is **not** validated against a provider list here. A wrong id makes
-   * `GET /slots` return an empty grid with the API's own message, which is the
-   * honest outcome; fetching the profile only to decide whether to trust the
-   * URL would be a second round trip before the page could show anything.
-   */
-  const trainerId = params.get('trainer') ?? '';
+  const draft = useBookingDraft();
+  const { raw } = draft;
 
-  const [services, setServices] = useState<ApiService[] | null>(null);
-  const [addresses, setAddresses] = useState<ApiAddress[]>([]);
-  const [who, setWho] = useState({ name: '', email: '', mobile: '' });
+  const data = useBookingData({
+    serviceId: raw.serviceId,
+    packageId: raw.packageId,
+    date: raw.date,
+    preferredAddressId: raw.addressId,
+    trainerId: raw.trainerId,
+  });
 
-  const [serviceId, setServiceId] = useState('');
-  const [addressId, setAddressId] = useState('');
-  const [date, setDate] = useState('');
-  /**
-   * The grid, tagged with the query it answers. Comparing that tag with the
-   * current one is what makes "loading" a derived value — so switching day
-   * cannot flash the previous day's times, and the effect never has to reset
-   * state synchronously on its way in.
-   */
-  const [loaded, setLoaded] = useState<{ key: string; slots: Slot[]; note: string | null } | null>(null);
-  const [slot, setSlot] = useState<Slot | null>(null);
+  const resolved = resolveDraft(raw, data);
 
-  const [goal, setGoal] = useState('Improve flexibility');
-  const [level, setLevel] = useState('Beginner');
-  const [notes, setNotes] = useState('');
-
-  const [quote, setQuote] = useState<Quote | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const days = useMemo(() => nextDays(6), []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    void (async () => {
-      const [live, saved, profile] = await Promise.all([
-        getServices(),
-        getAddresses(),
-        loadProfile(),
-      ]);
-
-      if (cancelled) return;
-
-      if (profile.unauthorised) {
-        router.replace('/login');
-        return;
-      }
-
-      setServices(live);
-      // `?service=<id>` from the homepage search, when it names a service that
-      // really exists — a stale or hand-edited id must not leave the wizard
-      // with nothing selected, so it falls back to the first service as before.
-      const requested = live.some((s) => s.id === wantedService) ? wantedService : '';
-      setServiceId((current) => current || requested || live[0]?.id || '');
-      setAddresses(saved ?? []);
-      setAddressId((current) => current || saved?.[0]?.id || '');
-      setDate((current) => current || days[0]);
-
-      if (profile.form) {
-        setWho({
-          name: [profile.form.firstName, profile.form.lastName].filter(Boolean).join(' '),
-          email: profile.form.email,
-          mobile: profile.form.mobile,
-        });
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router, days, wantedService]);
-
-  // `GET /slots` needs all three, so there is nothing to ask for until the
-  // address resolves. Derived rather than written into state by the effect.
-  const canQuerySlots = Boolean(serviceId && date && addressId);
-  // The trainer belongs in the key: switching trainer is a different question
-  // with a different answer, and without it the grid would keep showing the
-  // previous one's times.
-  const slotKey = `${serviceId}|${date}|${addressId}|${trainerId}`;
-
-  // The slot grid. Re-queried whenever any of its three inputs moves.
-  useEffect(() => {
-    if (!canQuerySlots) return;
-
-    let cancelled = false;
-
-    void (async () => {
-      const result = await getSlots(serviceId, date, addressId, trainerId || undefined);
-      if (cancelled) return;
-
-      setLoaded({ key: slotKey, slots: result.slots, note: result.error ?? result.message ?? null });
-      setSlot(null);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [serviceId, date, addressId, trainerId, canQuerySlots, slotKey]);
-
-  // Only the answer to the query being shown counts.
-  const showing = loaded?.key === slotKey ? loaded : null;
-
-  // The price. The server computes it; this never adds anything up locally.
-  useEffect(() => {
-    if (!serviceId) return;
-
-    let cancelled = false;
-
-    void (async () => {
-      const result = await getQuote({ serviceId });
-      if (!cancelled) setQuote(result.quote ?? null);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [serviceId]);
-
-  const service = services?.find((s) => s.id === serviceId);
-  const address = addresses.find((a) => a.id === addressId);
+  const go = useCallback(
+    (next: StepNumber) => {
+      if (!canReach(next, resolved.draft)) return draft.setError(blockedReason(resolved.draft));
+      draft.setError(null);
+      draft.setStep(next);
+    },
+    [draft, resolved.draft],
+  );
 
   const toCheckout = useCallback(() => {
-    if (!service) return setError('Choose a service.');
-    if (!addressId) return setError('Choose or add a session address.');
-    if (!slot) return setError('Choose an available time.');
-
-    const query = new URLSearchParams({
-      service: service.id,
-      address: addressId,
-      date,
-      from: String(slot.fromMinute),
-      to: String(slot.toMinute),
-      goal,
-      level,
-      ...(notes.trim() ? { notes: notes.trim() } : {}),
-      // Checkout is what calls `POST /bookings`, so the chosen trainer has to
-      // survive the hand-off. Dropped here, the customer would pick a trainer,
-      // see only that trainer's times, and then be auto-assigned somebody else.
-      ...(trainerId ? { trainer: trainerId } : {}),
-    });
-
+    const query = checkoutQuery(raw, resolved);
+    if (!resolved.complete || !query) return draft.setError(blockedReason(resolved.draft));
     router.push(`/checkout?${query}`);
-  }, [service, addressId, slot, date, goal, level, notes, trainerId, router]);
+  }, [raw, resolved, draft, router]);
+
+  const onAdded = useCallback(
+    (saved: ApiAddress) => {
+      data.setAddresses((current) => [...current, saved]);
+      draft.chooseAddress(saved.id);
+    },
+    [data, draft],
+  );
 
   return (
-    <div className="layout">
-      <div className="booking-main">
-        {trainerId ? <ChosenTrainer trainerId={trainerId} /> : null}
+    <>
+      <StepStrip step={raw.step} draft={resolved.draft} onPick={go} />
 
-        <section className="panel" id="servicePanel">
-          <div className="panel-head">
-            <span className="panel-icon">✳</span>
-            <div><h2>01. Choose your service</h2><p>Select the session that best fits your goals.</p></div>
-          </div>
+      <div className="layout">
+        <div className="booking-main">
+          <section className="panel">
+            <div className="panel-head">
+              <span className="panel-icon">{ICONS[raw.step]}</span>
+              <div>
+                <h2>{HEADS[raw.step].title}</h2>
+                <p>{HEADS[raw.step].blurb}</p>
+              </div>
+            </div>
 
-          {services === null && <p className="muted">Loading services…</p>}
-          {services?.length === 0 && <p className="muted">No services are published yet.</p>}
+            {raw.step === 1 ? (
+              <ServiceStep
+                trainerId={raw.trainerId}
+                changeTrainerHref={resolved.changeTrainerHref}
+                loading={data.services === null}
+                service={resolved.service}
+                packages={data.packages}
+                packageId={resolved.livePackageId}
+                onPackage={draft.setPackageId}
+                goal={raw.goal}
+                onGoal={draft.setGoal}
+                level={raw.level}
+                onLevel={draft.setLevel}
+              />
+            ) : null}
 
-          <div className="service-grid">
-            {(services ?? []).map((item, index) => (
-              <button
-                key={item.id}
-                className={`service-option${item.id === serviceId ? ' selected' : ''}`}
-                data-service={item.name}
-                data-price={item.basePrice}
-                onClick={() => setServiceId(item.id)}
-              >
-                <span className="radio"></span>
-                <span className="service-icon">{ICONS[index % ICONS.length]}</span>
-                <strong>{item.name}</strong>
-                <p>{item.category?.name ?? 'Session'} · {item.durationMin} minutes</p>
-                <span className="service-price">{money(Number(item.basePrice))} <small>/ session</small></span>
+            {raw.step === 2 ? (
+              <WhenPanel
+                days={raw.days}
+                date={raw.date}
+                onDate={draft.chooseDate}
+                slots={data.slots}
+                slot={raw.slot}
+                onSlot={draft.setSlot}
+                loading={data.slotsLoading}
+                note={data.slotsNote}
+                allowedWeekdays={resolved.pack?.allowedWeekdays ?? []}
+                needsAddress={!resolved.addressId}
+                onGoToLocation={() => draft.setStep(3)}
+              />
+            ) : null}
+
+            {raw.step === 3 ? (
+              <WherePanel
+                addresses={data.addresses}
+                addressId={resolved.addressId}
+                onAddress={draft.chooseAddress}
+                onAdded={onAdded}
+                notes={raw.notes}
+                onNotes={draft.setNotes}
+              />
+            ) : null}
+
+            {raw.step === 4 ? (
+              <ReviewPanel
+                who={data.who}
+                service={resolved.service}
+                pack={resolved.pack}
+                date={raw.date}
+                slot={raw.slot}
+                address={resolved.address}
+                goal={raw.goal}
+                level={raw.level}
+              />
+            ) : null}
+          </section>
+
+          <div className="bottom-actions">
+            <button
+              className="back-link"
+              onClick={() =>
+                raw.step === 1 ? router.push('/packages') : go((raw.step - 1) as StepNumber)
+              }
+            >
+              ← {raw.step === 1 ? 'Back to packages' : 'Back'}
+            </button>
+
+            {raw.step < 4 ? (
+              <button className="btn primary" onClick={() => go((raw.step + 1) as StepNumber)}>
+                Next ↗
               </button>
-            ))}
-          </div>
-
-          <div className="field-grid" style={{ marginTop: '17px' }}>
-            <div className="field">
-              <label htmlFor="goal">What is your main goal?</label>
-              <select id="goal" value={goal} onChange={(e) => setGoal(e.target.value)}>
-                <option>Improve flexibility</option>
-                <option>Build strength</option>
-                <option>Reduce stress</option>
-                <option>Beginner routine</option>
-                <option>General fitness</option>
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="level">Your experience level</label>
-              <select id="level" value={level} onChange={(e) => setLevel(e.target.value)}>
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        <section className="panel" id="datePanel">
-          <div className="panel-head">
-            <span className="panel-icon">▦</span>
-            <div><h2>02. Pick a date &amp; time</h2><p>Times come from your trainer availability for this service.</p></div>
-          </div>
-
-          <div className="date-grid" id="dateGrid">
-            {days.map((day) => {
-              const parts = dateParts(day);
-              return (
-                <button
-                  key={day}
-                  className={`date-option${day === date ? ' selected' : ''}`}
-                  data-date={parts.long}
-                  onClick={() => setDate(day)}
-                >
-                  <small>{parts.weekday}</small>
-                  <strong>{parts.day}</strong>
-                  <small>{parts.month}</small>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="subheading">Available times</div>
-
-          {!canQuerySlots ? (
-            <p className="muted">Add a session address below to see available times.</p>
-          ) : showing === null ? (
-            <p className="muted">Checking availability…</p>
-          ) : (
-            <div className="time-grid" id="timeGrid">
-              {showing.slots.map((option) => (
-                <button
-                  key={option.fromMinute}
-                  className={`time-option${slot?.fromMinute === option.fromMinute ? ' selected' : ''}`}
-                  onClick={() => setSlot(option)}
-                >
-                  {clockOf(option.fromMinute)}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {showing?.note && <p className="muted" style={{ marginTop: '10px' }}>{showing.note}</p>}
-        </section>
-
-        <section className="panel" id="locationPanel">
-          <div className="panel-head">
-            <span className="panel-icon">⌖</span>
-            <div><h2>03. Choose session location</h2><p>Where your trainer should come.</p></div>
-          </div>
-
-          <div className="location-options">
-            {addresses.map((saved) => (
+            ) : (
               <button
-                key={saved.id}
-                className={`location-option${saved.id === addressId ? ' selected' : ''}`}
-                data-location={saved.label}
-                onClick={() => setAddressId(saved.id)}
+                className="btn primary"
+                disabled={!resolved.complete}
+                onClick={toCheckout}
               >
-                <span className="loc-icon">⌂</span>
-                <span>
-                  <strong>{saved.label}</strong>
-                  <small>{saved.line1}{saved.city ? `, ${saved.city.name}` : ''} · {saved.pincode}</small>
-                </span>
+                Continue to Payment ↗
               </button>
-            ))}
+            )}
           </div>
 
-          {addresses.length === 0 && (
-            <p className="muted">
-              You have no saved address yet. Add one in <a href="/profile">your profile</a> and it will appear here.
-            </p>
-          )}
-
-          <div className="field" style={{ marginTop: '14px' }}>
-            <label htmlFor="notes">Notes for your trainer (optional)</label>
-            <textarea id="notes" placeholder="Share any preferences or details that may help your session."
-              value={notes} onChange={(e) => setNotes(e.target.value)}></textarea>
-          </div>
-        </section>
-
-        <section className="panel" id="reviewPanel">
-          <div className="panel-head">
-            <span className="panel-icon">✓</span>
-            <div><h2>04. Review your booking</h2><p>Double-check your selections before moving to payment.</p></div>
-          </div>
-          <div className="field-grid">
-            <div className="field">
-              <label htmlFor="customerName">Your full name</label>
-              <input id="customerName" readOnly={true} value={who.name} />
-            </div>
-            <div className="field">
-              <label htmlFor="customerEmail">Email address</label>
-              <input id="customerEmail" type="email" readOnly={true} value={who.email} placeholder="Add one in your profile" />
-            </div>
-            <div className="field full">
-              <label htmlFor="customerPhone">Mobile number</label>
-              <input id="customerPhone" type="tel" readOnly={true} value={who.mobile} />
-            </div>
-          </div>
-          <p style={{ fontSize: '9px', color: 'var(--muted)', margin: '12px 0 0' }}>
-            These come from your account. Change them in <a href="/profile">your profile</a>.
-          </p>
-        </section>
-
-        <div className="bottom-actions">
-          <button className="back-link" onClick={() => router.push('/')}>← Back</button>
-          <button className="btn primary" onClick={toCheckout}>Continue to Payment ↗</button>
+          {raw.error ? <p className="step-error">{raw.error}</p> : null}
         </div>
-        {error && <p className="muted" style={{ color: 'var(--orange)' }}>{error}</p>}
-      </div>
 
-      <aside>
-        <section className="summary-card">
-          <h2>Booking summary</h2>
-          <div className="summary-details">
-            <div className="summary-line"><span>Service</span><strong id="sumService">{service?.name ?? '—'}</strong></div>
-            <div className="summary-line"><span>Date</span><strong id="sumDate">{date ? dateParts(date).long : '—'}</strong></div>
-            <div className="summary-line"><span>Time</span><strong id="sumTime">{slot ? clockOf(slot.fromMinute) : 'Choose a time'}</strong></div>
-            <div className="summary-line"><span>Location</span><strong id="sumLocation">{address?.label ?? '—'}</strong></div>
-            <div className="summary-line"><span>Duration</span><strong id="sumDuration">{service ? `${service.durationMin} minutes` : '—'}</strong></div>
-          </div>
-          <div className="price-breakdown">
-            <div className="summary-line"><span>Session fee</span><strong id="sumFee">{quote ? money(quote.grossAmount) : '—'}</strong></div>
-            <div className="summary-line"><span>Travel</span><strong id="sumPlatform">{quote ? money(quote.travelCharge) : '—'}</strong></div>
-            <div className="summary-line"><span>Taxes</span><strong id="sumTax">{quote ? money(quote.tax) : '—'}</strong></div>
-            <div className="summary-line total"><span>Total</span><strong id="sumTotal">{quote ? money(quote.payable) : '—'}</strong></div>
-          </div>
-          <button className="btn primary" onClick={toCheckout}>Continue to Payment ↗</button>
-          <p className="terms">By continuing, you agree to the booking terms and cancellation policy shown at checkout.</p>
-          <div className="secure">♧ Secure checkout</div>
-        </section>
-        <section className="help-card">
-          <h3>Need a hand?</h3>
-          <p>Questions about your session? Our support experience can help you through booking.</p>
-          <a href="mailto:support@hellofit.example" style={{ display: 'inline-block' }}>Contact support →</a>
-        </section>
-      </aside>
-    </div>
+        <SummaryCard
+          service={resolved.service}
+          pack={resolved.pack}
+          date={raw.date}
+          slot={raw.slot}
+          address={resolved.address}
+          quote={data.quote}
+          ready={resolved.complete}
+          onContinue={toCheckout}
+        />
+      </div>
+    </>
   );
 }

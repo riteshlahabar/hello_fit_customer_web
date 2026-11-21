@@ -81,6 +81,7 @@ export default async function PackagesPage({
         {picked ? (
           <PackageCards
             packages={packages}
+            serviceId={picked.id}
             serviceName={picked.name}
             // The rate the percent was applied to, stated on the card
             // (client, 18 Nov 2026). `basePrice` arrives as a decimal string.

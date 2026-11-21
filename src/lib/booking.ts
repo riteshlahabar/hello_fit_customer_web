@@ -1,42 +1,32 @@
 'use client';
 
-// The booking workflow — PDF §5.7. Service, date and time, address, quote,
-// and the booking itself.
+// The price and the booking itself — PDF §5.7 and §5.8.
 //
-// **Availability is the backend's answer, never this file's.** `GET /slots`
-// takes a service, a calendar day and an address and returns the slots the
-// scheduling engine will actually honour; the grid renders what comes back
-// and nothing more. US-W08 requires exactly that ("availability is checked by
-// the backend").
+// Split on 21 Nov 2026, when this file went past the 200-line rule: the
+// addresses moved to `addresses.ts`, the slot grid to `slots.ts`, the clock
+// and calendar helpers to `clock.ts`. What is left is the two writes that
+// cost money.
 //
-// **A provider can be chosen as of 13 Nov 2026 (Phase 5).** `?trainer=<id>`
-// on `/booking` reaches `instructorId` on both `GET /slots` and
-// `POST /bookings`, which the backend has accepted all along: the slot grid
-// then shows only that trainer's free times, and the create re-checks they
-// are still free for every occurrence before taking money. Omitted, the
-// booking is auto-assigned exactly as before — that path is unchanged, so a
-// customer who starts from the catalog rather than a profile is unaffected.
+// **`packageId` is the price.** A package holds a signed percent and a head
+// count, the service holds the rate, and `PricingResolver` multiplies them:
+// `basePrice x persons x sessionCount`, then `percentAdjust`. The API has
+// taken `packageId` on both routes since 18 Nov — **the website never sent
+// it**, so every quote came back at one session of `Service.basePrice` and
+// the customer saw the base price after choosing a package (client,
+// 21 Nov 2026). It is now carried from `/packages` through the whole flow.
 //
-// **One thing the website still cannot supply**, flagged for the client:
+// **The server computes every figure.** Nothing here adds anything up: the
+// discount, the travel charge, the tax and the payable all come from
+// `POST /bookings/quote`, and the coupon is re-validated inside
+// `POST /bookings` rather than trusted from the quote the page showed.
 //
-// 1. **A service area on a new address.** `GET /slots` returns an empty grid
-//    when the address has no `areaId`, and `POST /addresses` takes `areaId`
-//    from the client. There is no public endpoint listing areas and no
-//    pincode-to-area resolution on the server, although the `pincodes` table
-//    holds exactly that mapping. So a website-created address shows no slots
-//    until an administrator sets its area.
+// **A provider can be chosen (PDF §3.6).** `instructorId` reaches both the
+// slot grid and the create, which re-checks that trainer is free for every
+// occurrence and refuses with a 409 naming the date rather than quietly
+// assigning somebody else. Omitted, the API auto-assigns as before.
 
 import { apiGetResult, apiSend } from './api';
 import { tokenStore } from './auth';
-import type { ApiAddress } from './profile';
-
-export interface Slot {
-  fromMinute: number;
-  toMinute: number;
-  fromTime: string;
-  toTime: string;
-  availableInstructors: number;
-}
 
 export interface Quote {
   unitPrice: number;
@@ -63,47 +53,14 @@ export interface CreatedBooking {
 
 const auth = () => tokenStore.access;
 
-export async function getAddresses(): Promise<ApiAddress[] | null> {
-  const token = auth();
-  if (!token) return null;
-
-  const result = await apiGetResult<ApiAddress[]>('/app/customer/addresses', { token });
-  return result.ok ? result.data : null;
-}
-
-export interface SlotsResult {
-  slots: Slot[];
-  /** The API's own message — "No slots available for this date". */
-  message?: string;
-  error?: string;
-}
-
-export async function getSlots(
-  serviceId: string,
-  date: string,
-  addressId: string,
-  /** Narrows the grid to one trainer — `/booking?trainer=<id>`, PDF §3.6. */
-  instructorId?: string,
-): Promise<SlotsResult> {
-  const token = auth();
-  if (!token) return { slots: [], error: 'Please sign in to see available times' };
-
-  const query = new URLSearchParams({ serviceId, date, addressId });
-  if (instructorId) query.set('instructorId', instructorId);
-  const result = await apiGetResult<Slot[]>(`/app/customer/slots?${query}`, { token });
-
-  if (!result.ok) return { slots: [], error: result.error.message };
-
-  const meta = result.meta as { count?: number } | undefined;
-
-  return {
-    slots: result.data,
-    message: (meta?.count ?? result.data.length) === 0 ? 'No times available on this day' : undefined,
-  };
-}
-
 export interface QuoteInput {
   serviceId: string;
+  /**
+   * The package the customer picked on `/packages`. It carries the session
+   * count and the head count, so `sessionCount` below must not be sent with
+   * it — the API refuses a head count that disagrees with the package.
+   */
+  packageId?: string;
   sessionCount?: number;
   addonIds?: string[];
   couponCode?: string;
@@ -125,7 +82,10 @@ export async function getQuote(input: QuoteInput): Promise<QuoteResult> {
     'POST',
     {
       serviceId: input.serviceId,
-      ...(input.sessionCount ? { sessionCount: input.sessionCount } : {}),
+      ...(input.packageId ? { packageId: input.packageId } : {}),
+      // Only without a package: the package defines its own count and the API
+      // ignores this field when one is present.
+      ...(!input.packageId && input.sessionCount ? { sessionCount: input.sessionCount } : {}),
       ...(input.addonIds?.length ? { addonIds: input.addonIds } : {}),
       ...(input.couponCode ? { couponCode: input.couponCode } : {}),
       ...(input.distanceKm !== undefined ? { distanceKm: input.distanceKm } : {}),
@@ -141,19 +101,11 @@ export interface CreateInput extends QuoteInput {
   sessionDate: string;
   fromMinute: number;
   toMinute?: number;
-  /**
-   * The trainer the customer chose. Omitted, the API auto-assigns, which is
-   * what every website booking did before Phase 5. Set, the API re-checks
-   * that trainer is still free for every occurrence and refuses with a 409
-   * naming the date rather than quietly assigning somebody else — the one
-   * outcome that would make the chosen trainer meaningless.
-   */
   instructorId?: string;
   /**
-   * Customer-supplied booking preferences — the goal, level and trainer note
-   * the design collects. `Booking.preferences` is the Json column meant for
-   * them, so they are kept rather than dropped. Nothing surfaces them to the
-   * teacher yet; flagged for the client.
+   * The goal, level and trainer note the design collects.
+   * `Booking.preferences` is the Json column meant for them; `GET /requests`
+   * and `GET /bookings/:id` in the trainer app surface the goal and the notes.
    */
   preferences?: Record<string, unknown>;
 }
@@ -172,17 +124,18 @@ export async function createBooking(input: CreateInput): Promise<CreateResult> {
     'POST',
     {
       serviceId: input.serviceId,
+      ...(input.packageId ? { packageId: input.packageId } : {}),
       addressId: input.addressId,
       sessionDate: input.sessionDate,
       fromMinute: input.fromMinute,
       ...(input.toMinute !== undefined ? { toMinute: input.toMinute } : {}),
       ...(input.instructorId ? { instructorId: input.instructorId } : {}),
-      ...(input.sessionCount ? { sessionCount: input.sessionCount } : {}),
+      ...(!input.packageId && input.sessionCount ? { sessionCount: input.sessionCount } : {}),
       ...(input.addonIds?.length ? { addonIds: input.addonIds } : {}),
       ...(input.couponCode ? { couponCode: input.couponCode } : {}),
       ...(input.preferences ? { preferences: input.preferences } : {}),
       // Files the booking under the right channel for the admin screens and
-      // 6.12 reports; the API defaults to APP_CUSTOMER without it.
+      // §6.12 reports; the API defaults to APP_CUSTOMER without it.
       source: 'WEBSITE',
     },
     token,
@@ -216,7 +169,9 @@ export interface BookingDetail {
 }
 
 /** One booking, for the confirmation page. 404s are the caller's to report. */
-export async function getBookingDetail(id: string): Promise<{ booking?: BookingDetail; error?: string; unauthorised?: boolean }> {
+export async function getBookingDetail(
+  id: string,
+): Promise<{ booking?: BookingDetail; error?: string; unauthorised?: boolean }> {
   const token = auth();
   if (!token) return { unauthorised: true };
 
@@ -225,27 +180,4 @@ export async function getBookingDetail(id: string): Promise<{ booking?: BookingD
   return result.ok
     ? { booking: result.data }
     : { error: result.error.message, unauthorised: result.error.status === 401 };
-}
-
-/** `480` → `08:00 AM`. Minutes from midnight, as the slot engine stores them. */
-export function clockOf(minute: number): string {
-  const hour24 = Math.floor(minute / 60);
-  const minutes = String(minute % 60).padStart(2, '0');
-  const suffix = hour24 < 12 ? 'AM' : 'PM';
-  const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
-  return `${hour12}:${minutes} ${suffix}`;
-}
-
-/** The next `count` calendar days as YYYY-MM-DD, starting today. */
-export function nextDays(count: number): string[] {
-  const days: string[] = [];
-  const cursor = new Date();
-
-  for (let index = 0; index < count; index += 1) {
-    const month = String(cursor.getMonth() + 1).padStart(2, '0');
-    days.push(`${cursor.getFullYear()}-${month}-${String(cursor.getDate()).padStart(2, '0')}`);
-    cursor.setDate(cursor.getDate() + 1);
-  }
-
-  return days;
 }

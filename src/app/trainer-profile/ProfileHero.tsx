@@ -16,13 +16,11 @@
 //     than showing nothing.
 //   * **"↗ Share" is deleted.** No endpoint and no design behind it.
 
-import Image from 'next/image';
 import Link from 'next/link';
+import { TrainerPhoto } from '@/components/TrainerPhoto';
 import { SaveHeart } from '@/components/trainers/SaveHeart';
 import type { ProviderProfile } from '@/lib/provider-profile';
 import { rupees, starRow } from './bits';
-
-const PLACEHOLDER = '/hellofit-logo.png';
 
 export function ProfileHero({
   provider,
@@ -44,12 +42,16 @@ export function ProfileHero({
   return (
     <section className="profile-hero">
       <div className="portrait">
-        <Image
-          src={provider.photoUrl ?? PLACEHOLDER}
-          alt={provider.name}
+        {/* The API hands out an absolute `http://…` file link that
+            `next/image` refuses, and the old fallback was the company logo —
+            see lib/media.ts. */}
+        <TrainerPhoto
+          name={provider.name}
+          photoUrl={provider.photoUrl}
           width={900}
           height={1100}
           sizes="(max-width:950px) 100vw, 40vw"
+          className="inline"
         />
         <span className="verified">
           <span>✓</span> Verified

@@ -45,6 +45,15 @@ export type ProviderSort = 'recommended' | 'rating' | 'price';
 export interface ProviderFilters {
   q?: string;
   categoryId?: string[];
+  /**
+   * One service — the booking flow filter, narrower than a category.
+   * The customer picks a package on `/packages`, which is sold against a
+   * service, so by the time they reach this list the service is decided and
+   * only providers an administrator approved for it may be shown (client,
+   * 21 Nov 2026). A category would be wrong: it holds several services, and a
+   * provider approved for Hatha Yoga must not surface for Power Yoga.
+   */
+  serviceId?: string;
   cityId?: string;
   areaId?: string;
   maxPrice?: number;
@@ -63,7 +72,10 @@ export function toQueryString(filters: ProviderFilters): string {
   const params = new URLSearchParams();
 
   if (filters.q?.trim()) params.set('q', filters.q.trim());
-  if (filters.categoryId?.length) params.set('categoryId', filters.categoryId.join(','));
+  // The service wins over the category server-side when both are sent, so
+  // there is no point sending both.
+  if (filters.serviceId) params.set('serviceId', filters.serviceId);
+  else if (filters.categoryId?.length) params.set('categoryId', filters.categoryId.join(','));
   if (filters.cityId) params.set('cityId', filters.cityId);
   if (filters.areaId) params.set('areaId', filters.areaId);
   if (typeof filters.maxPrice === 'number') params.set('maxPrice', String(filters.maxPrice));

@@ -20,7 +20,7 @@ import {
   type ProviderSort,
   type SearchMeta,
 } from '@/lib/providers';
-import { ProviderResultCard } from './ProviderResultCard';
+import { ProviderResultCard, type BookingContextProps } from './ProviderResultCard';
 import { TrainerFilters, type FilterOption } from './TrainerFilters';
 import { TrainerSearchPanel } from './TrainerSearchPanel';
 
@@ -38,6 +38,13 @@ interface Props {
    * anywhere silently widens the search back out.
    */
   initialFilters?: ProviderFilters;
+  /**
+   * Set when the visitor arrived from a package card, so the list is already
+   * narrowed to one service. It turns each card's primary button into
+   * "Select trainer", which carries service, package and trainer straight to
+   * the booking wizard (client, 21 Nov 2026).
+   */
+  booking?: BookingContextProps;
 }
 
 const EMPTY: ProviderFilters = { page: 1 };
@@ -49,6 +56,7 @@ export function TrainerSearch({
   categories,
   cities,
   initialFilters,
+  booking,
 }: Props) {
   const [filters, setFilters] = useState<ProviderFilters>(
     initialFilters ?? EMPTY,
@@ -98,7 +106,11 @@ export function TrainerSearch({
           categories={categories}
           cities={cities}
           onChange={setFilters}
-          onReset={() => setFilters(EMPTY)}
+          // Reset clears what the visitor chose, not what they are booking:
+          // dropping the service here would list trainers who do not teach it.
+          onReset={() =>
+            setFilters(booking ? { ...EMPTY, serviceId: booking.serviceId } : EMPTY)
+          }
         />
 
         <section className="results-area">
@@ -145,7 +157,7 @@ export function TrainerSearch({
 
           <div className="trainer-list">
             {rows.map((provider) => (
-              <ProviderResultCard key={provider.id} provider={provider} />
+              <ProviderResultCard key={provider.id} provider={provider} booking={booking} />
             ))}
           </div>
 
@@ -153,7 +165,9 @@ export function TrainerSearch({
             <div className="empty">
               {error
                 ? `We could not load trainers just now (${error}). Please try again.`
-                : 'No trainers match these filters yet. Try widening your search.'}
+                : booking
+                  ? `No trainer offers ${booking.serviceName} yet. Choose another service and we will show who teaches it.`
+                  : 'No trainers match these filters yet. Try widening your search.'}
             </div>
           ) : null}
 

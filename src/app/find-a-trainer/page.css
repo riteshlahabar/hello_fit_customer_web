@@ -181,3 +181,63 @@
 [data-hf-page="find-a-trainer"] .mini-stats {gap:12px}
 [data-hf-page="find-a-trainer"] .mini-stats b {font-size:15px}
 }
+
+/* The booking-context strip — which service and package the list is narrowed
+ * to, and the way back to change either (client, 21 Nov 2026). Sits between
+ * the hero and the search panel, so it borrows the page's own card look
+ * rather than introducing a second one. */
+[data-hf-page="find-a-trainer"] .booking-context {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: #fffaf4;
+  border: 1px solid #f3b2a7;
+  border-radius: 13px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+
+[data-hf-page="find-a-trainer"] .booking-context .eyebrow {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+[data-hf-page="find-a-trainer"] .booking-context strong {
+  display: block;
+  font-size: 14px;
+}
+
+[data-hf-page="find-a-trainer"] .booking-context small {
+  font-size: 10px;
+  color: #83796e;
+}
+
+[data-hf-page="find-a-trainer"] .booking-context-links a {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+}
+
+/* Two actions where the design drew one, once the service and package are
+ * already chosen: select this trainer, or read the profile first. */
+[data-hf-page="find-a-trainer"] .card-actions {
+  display: grid;
+  gap: 5px;
+  justify-items: end;
+}
+
+[data-hf-page="find-a-trainer"] .card-actions .text-link {
+  font-size: 9px;
+  font-weight: 700;
+  color: #83796e;
+}
+
+[data-hf-page="find-a-trainer"] .card-actions .text-link:hover {
+  color: var(--orange);
+}

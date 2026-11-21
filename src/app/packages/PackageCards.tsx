@@ -20,6 +20,13 @@
 //
 // So the card's job is to explain the deal, and its button carries on to the
 // trainer search, where the package is actually applied.
+//
+// **The button carries the choice (client, 21 Nov 2026).** It used to push a
+// bare `/find-a-trainer`, which threw both the service and the package away:
+// the trainer list could not narrow to providers approved for the service,
+// and the booking wizard re-asked for a service and then priced the booking
+// at `Service.basePrice`. It now hands both on in the URL — and so does every
+// page after it, all the way to `POST /bookings`.
 
 import { useRouter } from 'next/navigation';
 import type { Package } from '@/lib/packages';
@@ -27,10 +34,13 @@ import { caption, plural, rupees, terms } from './package-card.text';
 
 export function PackageCards({
   packages,
+  serviceId,
   serviceName,
   serviceBasePrice,
 }: {
   packages: Package[];
+  /** The picked service, handed on to the trainer search and the booking. */
+  serviceId?: string;
   /** Set once a service is picked — the rate the percent was applied to. */
   serviceName?: string;
   /**
@@ -111,9 +121,15 @@ export function PackageCards({
 
           <button
             className="plan-btn"
-            onClick={() => router.push('/find-a-trainer')}
+            onClick={() =>
+              router.push(
+                serviceId
+                  ? `/find-a-trainer?service=${serviceId}&package=${pack.id}`
+                  : '/find-a-trainer',
+              )
+            }
           >
-            Find a Trainer
+            Choose this package
           </button>
         </article>
       ))}

@@ -13,7 +13,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { clockOf, getBookingDetail } from '@/lib/booking';
+import { getBookingDetail } from '@/lib/booking';
+import { clockOf } from '@/lib/clock';
 import type { BookingDetail } from '@/lib/booking';
 import { formatBookingDate } from '@/data/bookings';
 

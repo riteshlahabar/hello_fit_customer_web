@@ -197,3 +197,206 @@
 [data-hf-page="booking"] .bottom-actions .btn {padding-inline:14px}
 [data-hf-page="booking"] .footer-grid {gap:20px 13px}
 }
+
+/* --- 21-11-2026: the step strip became a tab control, and step 1 now states
+   the trainer, service and package instead of re-listing every service. --- */
+
+[data-hf-page="booking"] .step {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: 0.18s;
+}
+
+[data-hf-page="booking"] .step:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+[data-hf-page="booking"] .step:not(:disabled):hover {
+  border-color: #f3b2a7;
+}
+
+[data-hf-page="booking"] .step-error {
+  margin: 10px 0 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+}
+
+/* The chosen trainer — photo beside the facts. */
+[data-hf-page="booking"] .chosen-trainer {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #fffaf4;
+  margin-bottom: 15px;
+}
+
+[data-hf-page="booking"] .chosen-photo {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex: 0 0 72px;
+  background: #e3c9b4;
+}
+
+[data-hf-page="booking"] .chosen-photo img {
+  object-fit: cover;
+}
+
+[data-hf-page="booking"] .chosen-facts strong { display: block; font-size: 13px; }
+[data-hf-page="booking"] .chosen-facts small { display: block; font-size: 10px; color: #83796e; margin: 3px 0 6px; }
+[data-hf-page="booking"] .chosen-links a { font-size: 10px; font-weight: 700; color: var(--orange); }
+
+/* "Service" and "Package", each with its way back. */
+[data-hf-page="booking"] .chosen-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0e7de;
+}
+
+[data-hf-page="booking"] .chosen-label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+[data-hf-page="booking"] .chosen-row strong { display: block; font-size: 13px; }
+[data-hf-page="booking"] .chosen-row small { display: block; font-size: 10px; color: #83796e; margin-top: 2px; }
+
+[data-hf-page="booking"] .text-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--orange);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* The package choices — only shown when none arrived in the URL, or to swap. */
+[data-hf-page="booking"] .package-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+[data-hf-page="booking"] .package-option {
+  position: relative;
+  text-align: left;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 13px 13px 13px 32px;
+  cursor: pointer;
+  font: inherit;
+  transition: 0.18s;
+}
+
+[data-hf-page="booking"] .package-option:hover { border-color: #f3b2a7; }
+
+[data-hf-page="booking"] .package-option.selected {
+  border-color: var(--orange);
+  background: #fff6f3;
+}
+
+[data-hf-page="booking"] .package-option .radio {
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid #d9cabb;
+  border-radius: 50%;
+}
+
+[data-hf-page="booking"] .package-option.selected .radio {
+  border-color: var(--orange);
+  background: radial-gradient(circle, var(--orange) 0 44%, transparent 46%);
+}
+
+[data-hf-page="booking"] .package-name { display: block; font-size: 12px; font-weight: 700; }
+[data-hf-page="booking"] .package-option small { display: block; font-size: 9px; color: #83796e; margin-top: 4px; line-height: 1.6; }
+[data-hf-page="booking"] .package-price { display: block; margin-top: 8px; font-size: 14px; font-weight: 700; }
+[data-hf-page="booking"] .package-price small { font-weight: 400; margin-top: 1px; }
+
+/* "Session ends at 09:00 AM" — derived, never a second control. */
+[data-hf-page="booking"] .session-span {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--ink);
+}
+
+[data-hf-page="booking"] .session-span small { color: var(--muted); font-size: 9px; }
+
+/* Add-a-new-address, inside the location step. */
+[data-hf-page="booking"] .add-address {
+  margin-top: 12px;
+  background: white;
+  border: 1px dashed #d9cabb;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 11px;
+  padding: 11px 15px;
+  cursor: pointer;
+}
+
+[data-hf-page="booking"] .add-address:hover { border-color: var(--orange); color: var(--orange); }
+
+[data-hf-page="booking"] .address-form {
+  margin-top: 13px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #fffaf4;
+}
+
+[data-hf-page="booking"] .address-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* Step 4 restates the three panels behind it, which can no longer be seen. */
+[data-hf-page="booking"] .review-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #f0e7de;
+}
+
+[data-hf-page="booking"] .review-facts dt {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+[data-hf-page="booking"] .review-facts dd { margin: 0; font-size: 12px; font-weight: 700; }
+[data-hf-page="booking"] .review-facts dd small { display: block; font-size: 9px; font-weight: 400; color: #83796e; margin-top: 2px; }
+
+[data-hf-page="booking"] .review-note { font-size: 9px; color: var(--muted); margin: 12px 0 0; }
+
+[data-hf-page="booking"] .date-option:disabled { opacity: 0.4; cursor: not-allowed; }

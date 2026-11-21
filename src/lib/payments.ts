@@ -52,6 +52,25 @@ export async function verifyPayment(input: VerifyInput): Promise<{ ok: boolean; 
   return result.ok ? { ok: true } : { ok: false, error: result.error.message };
 }
 
+/**
+ * Settles the booking through the API's development gateway.
+ *
+ * **Why this exists.** With no `RAZORPAY_*` configured the server issues an
+ * order with `publicKey: 'dev_key'` and `gateway: 'MANUAL'`, and this page
+ * handed it to the real `checkout.razorpay.com` regardless — so payment could
+ * not complete on any machine without credentials (client, 21 Nov 2026). The
+ * signing stays on the server: `ManualGateway` accepts only a signature over
+ * a development secret, and a secret shipped into the client bundle is not a
+ * secret. The route 403s as soon as a real gateway is configured.
+ */
+export async function devSettle(bookingId: string): Promise<{ ok: boolean; error?: string }> {
+  const token = auth();
+  if (!token) return { ok: false, error: 'Please sign in again' };
+
+  const result = await apiSend('/app/customer/payments/dev-settle', 'POST', { bookingId }, token);
+  return result.ok ? { ok: true } : { ok: false, error: result.error.message };
+}
+
 /** Pay the whole booking from the HelloFit wallet — no gateway involved. */
 export async function payFromWallet(bookingId: string): Promise<{ ok: boolean; error?: string }> {
   const token = auth();

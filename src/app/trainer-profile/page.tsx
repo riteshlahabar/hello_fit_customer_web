@@ -54,9 +54,9 @@ function NotFound({ reason }: { reason: string }) {
 export default async function TrainerProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; service?: string; package?: string }>;
 }) {
-  const { id } = await searchParams;
+  const { id, service, package: packageId } = await searchParams;
 
   if (!id) return <NotFound reason="No trainer selected" />;
 
@@ -74,8 +74,25 @@ export default async function TrainerProfilePage({
   // to discover who is suspended or unapproved. One message for both.
   if (!provider) return <NotFound reason="Trainer not found" />;
 
-  const bookHref = `/booking?trainer=${provider.id}`;
-  const savedHref = `/trainer-profile?id=${provider.id}`;
+  /**
+   * A service and package already chosen upstream travel through the profile
+   * (client, 21 Nov 2026). Dropped here, a customer who stops to read the
+   * profile would land in the booking wizard with no package and be asked to
+   * pick one all over again.
+   */
+  // The package rides along; the service does not, because the profile's own
+  // service list links to a *different* service per row and a second
+  // `?service=` would be ignored in favour of the first.
+  const bookBase = `/booking?trainer=${provider.id}` + (packageId ? `&package=${packageId}` : '');
+
+  /** One row of the profile's service list — that service, this trainer. */
+  const serviceHref = (serviceId: string) => `${bookBase}&service=${serviceId}`;
+
+  const bookHref = service ? serviceHref(service) : bookBase;
+
+  const carried =
+    (service ? `&service=${service}` : '') + (packageId ? `&package=${packageId}` : '');
+  const savedHref = `/trainer-profile?id=${provider.id}${carried}`;
 
   return (
     <div data-hf-page="trainer-profile">
@@ -98,6 +115,7 @@ export default async function TrainerProfilePage({
               <ProfileTabs
                 provider={provider}
                 reviews={reviews}
+                serviceHref={serviceHref}
                 bookHref={bookHref}
               />
 
@@ -123,7 +141,7 @@ export default async function TrainerProfilePage({
                           <small>per session</small>
                           <Link
                             className="btn primary"
-                            href={`${bookHref}&service=${service.id}`}
+                            href={serviceHref(service.id)}
                           >
                             Select
                           </Link>

@@ -119,3 +119,32 @@ button {
 [data-hf-shell] .avatar:hover {
   box-shadow: 0 0 0 3px #fff0e8;
 }
+
+/* The stand-in for a provider with no photo — initials on the brand's own
+ * sand, filling whatever box the page gave the image. It is deliberately
+ * unscoped: `TrainerPhoto` draws it on the results card, the profile portrait
+ * and the booking wizard, and each of those pages sizes its own container.
+ * The company logo used to sit here, which on a grid of six photo-less
+ * providers read as six broken images. */
+.avatar-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #f0ddcd, #e3c9b4);
+  color: #8a5137;
+  font-family: Anton, sans-serif;
+  font-size: clamp(22px, 14cqw, 64px);
+  letter-spacing: 1px;
+  user-select: none;
+  container-type: inline-size;
+}
+
+/* Not every host is a positioned box — the profile portrait is an intrinsic
+ * image, not a filled one — so a modifier keeps it in the flow there. */
+.avatar-fallback.inline {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  aspect-ratio: 9 / 11;
+}

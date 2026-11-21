@@ -115,7 +115,7 @@ export default async function TrainerProfilePage({
               <ProfileTabs
                 provider={provider}
                 reviews={reviews}
-                serviceHref={serviceHref}
+                bookBase={bookBase}
                 bookHref={bookHref}
               />
 

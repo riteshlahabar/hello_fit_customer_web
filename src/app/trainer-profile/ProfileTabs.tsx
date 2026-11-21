@@ -34,14 +34,23 @@ export function ProfileTabs({
   provider,
   reviews,
   bookHref,
-  serviceHref,
+  bookBase,
 }: {
   provider: ProviderProfile;
   reviews: ProviderReviewsPayload | null;
   bookHref: string;
-  /** Book *this* service with this trainer — see the page for why it is not
-   * `bookHref` with a service appended. */
-  serviceHref: (serviceId: string) => string;
+  /**
+   * Everything the booking URL needs **except** the service, so each row of
+   * the service list can append its own: `${bookBase}&service=<id>`.
+   *
+   * **A string, not a function.** It was `serviceHref: (id) => string` for
+   * half a day, and a server component cannot pass a function to a client
+   * component — React throws "Functions cannot be passed directly to Client
+   * Components" and the whole page 500s. `tsc`, `eslint` and `next build` all
+   * stayed green, because this page is dynamic and is never rendered at build
+   * time. → `state/gotchas/website.md`
+   */
+  bookBase: string;
 }) {
   const [active, setActive] = useState<Tab>('about');
 
@@ -118,7 +127,7 @@ export function ProfileTabs({
                     </p>
                     <Link
                       className="btn outline"
-                      href={serviceHref(service.id)}
+                      href={`${bookBase}&service=${service.id}`}
                     >
                       Choose this service
                     </Link>

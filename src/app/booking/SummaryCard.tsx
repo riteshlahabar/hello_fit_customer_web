@@ -24,14 +24,18 @@ export function SummaryCard({
   slot,
   address,
   quote,
-  onContinue,
-  ready,
   /**
-   * Only step 4 offers payment (client, 23-11-2026). The card is beside every
-   * step, so without this the button sat next to "choose a service" — two
-   * ways forward on the same screen, one of them skipping the review.
+   * Step 4 only, because that is where the booking is agreed to (client,
+   * 23-11-2026).
+   *
+   * The card used to carry a **Continue to Payment** button behind this flag.
+   * It is gone: the review step already has one in `.bottom-actions`, so the
+   * screen offered the same action twice (client, 23-11-2026 — the second
+   * instruction that day about this card; the first moved the button to step
+   * 4 at all, when it sat next to "choose a service"). Only the terms
+   * sentence is left, and it belongs to the button that remains.
    */
-  showContinue,
+  showTerms,
 }: {
   service: ApiService | null;
   pack: Package | null;
@@ -39,9 +43,7 @@ export function SummaryCard({
   slot: Slot | null;
   address: ApiAddress | null;
   quote: Quote | null;
-  onContinue: () => void;
-  ready: boolean;
-  showContinue: boolean;
+  showTerms: boolean;
 }) {
   return (
     <aside>
@@ -101,29 +103,15 @@ export function SummaryCard({
           </div>
         </div>
 
-        {showContinue ? (
-          <>
-            <button className="btn primary" disabled={!ready} onClick={onContinue}>
-              Continue to Payment ↗
-            </button>
-            <p className="terms">
-              By continuing, you agree to the booking terms and cancellation policy shown
-              at checkout.
-            </p>
-          </>
+        {/* The disclosure stays, the button does not — the review step's own
+            "Continue to Payment" in `.bottom-actions` is the one. */}
+        {showTerms ? (
+          <p className="terms">
+            By continuing, you agree to the booking terms and cancellation policy shown
+            at checkout.
+          </p>
         ) : null}
         <div className="secure">♧ Secure checkout</div>
-      </section>
-
-      <section className="help-card">
-        <h3>Need a hand?</h3>
-        <p>
-          Questions about your session? Our support experience can help you through
-          booking.
-        </p>
-        <a href="mailto:support@hellofit.example" style={{ display: 'inline-block' }}>
-          Contact support →
-        </a>
       </section>
     </aside>
   );

@@ -186,9 +186,7 @@ export function BookingWizard() {
           slot={raw.slot}
           address={resolved.address}
           quote={data.quote}
-          ready={resolved.complete}
-          onContinue={toCheckout}
-          showContinue={raw.step === 4}
+          showTerms={raw.step === 4}
         />
       </div>
     </>

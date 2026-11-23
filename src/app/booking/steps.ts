@@ -7,17 +7,18 @@
 // service". The design's stylesheet has carried `.step.active` and
 // `.step.done` all along — the wiring is all that was missing.
 //
-// **The order is the client's** (21 Nov 2026): trainer and service, then date
-// and time, then location, then review. That puts the time before the
-// address, and `GET /slots` needs an address — so the wizard starts from the
-// customer's default one and the Location step re-queries when it changes.
-// With no saved address at all, step 2 says so and offers the jump to step 3
-// rather than showing an empty grid that looks like "nobody is free".
+// **The order is the client's** (23 Nov 2026): trainer and service, then
+// location, then date and time, then review. It was time-then-location until
+// now, which is what hid the start times: `GET /slots` cannot answer without
+// an address — the institute window, the travel buffer and the daily cap are
+// all computed against where the trainer has to travel to — so a customer
+// with no saved address reached step 2 and saw an empty grid. Asking where
+// first means the time step always has a real question to ask.
 
 export const STEPS = [
   { n: 1, title: 'Choose service', hint: 'Trainer, service & package' },
-  { n: 2, title: 'Date & time', hint: 'Your schedule' },
-  { n: 3, title: 'Location', hint: 'Where to meet' },
+  { n: 2, title: 'Location', hint: 'Where to meet' },
+  { n: 3, title: 'Date & time', hint: 'Your schedule' },
   { n: 4, title: 'Review', hint: 'Confirm details' },
 ] as const;
 
@@ -43,9 +44,9 @@ export function isAnswered(step: StepNumber, draft: Draft): boolean {
       // count and the head count, and it is the only discount there is.
       return Boolean(draft.serviceId && draft.packageId);
     case 2:
-      return Boolean(draft.date && draft.hasSlot);
-    case 3:
       return Boolean(draft.addressId);
+    case 3:
+      return Boolean(draft.date && draft.hasSlot);
     case 4:
       return true;
   }
@@ -62,7 +63,7 @@ export function canReach(step: StepNumber, draft: Draft): boolean {
 export function blockedReason(draft: Draft): string {
   if (!draft.serviceId) return 'Choose a service first.';
   if (!draft.packageId) return 'Choose a package first — it sets the price.';
+  if (!draft.addressId) return 'Choose a session address first — the times depend on it.';
   if (!draft.date || !draft.hasSlot) return 'Pick a date and a start time first.';
-  if (!draft.addressId) return 'Choose a session address first.';
   return '';
 }

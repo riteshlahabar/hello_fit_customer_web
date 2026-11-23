@@ -18,6 +18,10 @@
 // **The customer picks a start, not a range** — the end is the service's own
 // length. See `WhenPanel`.
 //
+// **Location is step 2 and the time is step 3** (client, 23 Nov 2026). The
+// other way round, the start-time grid was empty for anyone with no saved
+// address, because `GET /slots` is computed against the session address.
+//
 // Three files behind this one: `useBookingDraft` holds the raw choices,
 // `useBookingData` does the reading, `resolveDraft` turns the two into what
 // the panels render. This file is the panels.
@@ -36,12 +40,12 @@ import { useBookingDraft } from './useBookingDraft';
 import { checkoutQuery, resolveDraft } from './resolveDraft';
 import { blockedReason, canReach, type StepNumber } from './steps';
 
-const ICONS: Record<StepNumber, string> = { 1: '✳', 2: '▦', 3: '⌖', 4: '✓' };
+const ICONS: Record<StepNumber, string> = { 1: '✳', 2: '⌖', 3: '▦', 4: '✓' };
 
 const HEADS: Record<StepNumber, { title: string; blurb: string }> = {
   1: { title: '01. Your trainer & service', blurb: 'Who you chose, and what you are booking.' },
-  2: { title: '02. Pick a date & start time', blurb: 'The session ends after the service length.' },
-  3: { title: '03. Choose session location', blurb: 'Where your trainer should come.' },
+  2: { title: '02. Choose session location', blurb: 'Where your trainer should come.' },
+  3: { title: '03. Pick a date & start time', blurb: 'The session ends after the service length.' },
   4: { title: '04. Review your booking', blurb: 'Double-check before moving to payment.' },
 };
 
@@ -115,6 +119,17 @@ export function BookingWizard() {
             ) : null}
 
             {raw.step === 2 ? (
+              <WherePanel
+                addresses={data.addresses}
+                addressId={resolved.addressId}
+                onAddress={draft.chooseAddress}
+                onAdded={onAdded}
+                notes={raw.notes}
+                onNotes={draft.setNotes}
+              />
+            ) : null}
+
+            {raw.step === 3 ? (
               <WhenPanel
                 days={raw.days}
                 date={raw.date}
@@ -125,19 +140,6 @@ export function BookingWizard() {
                 loading={data.slotsLoading}
                 note={data.slotsNote}
                 allowedWeekdays={resolved.pack?.allowedWeekdays ?? []}
-                needsAddress={!resolved.addressId}
-                onGoToLocation={() => draft.setStep(3)}
-              />
-            ) : null}
-
-            {raw.step === 3 ? (
-              <WherePanel
-                addresses={data.addresses}
-                addressId={resolved.addressId}
-                onAddress={draft.chooseAddress}
-                onAdded={onAdded}
-                notes={raw.notes}
-                onNotes={draft.setNotes}
               />
             ) : null}
 

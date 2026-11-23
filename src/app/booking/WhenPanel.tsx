@@ -1,6 +1,12 @@
 'use client';
 
-// Step 2 — the date, and the time the session **starts**.
+// Step 3 — the date, and the time the session **starts**.
+//
+// **It was step 2 until 23 Nov 2026**, ahead of the address, and the grid
+// came up empty for anyone with no saved address: `GET /slots` needs one.
+// Location is now the step before this, so the address is always decided by
+// the time this panel renders and there is no "add an address first" state
+// left to show.
 //
 // **Client, 21 Nov 2026:** "give choice to select time by customer in slot …
 // but it is according to session time which is already set — if customer
@@ -33,9 +39,6 @@ export function WhenPanel({
   note,
   /** Weekdays the chosen package allows; empty means any. */
   allowedWeekdays,
-  /** No saved address yet, so there is nothing to compute availability for. */
-  needsAddress,
-  onGoToLocation,
 }: {
   days: string[];
   date: string;
@@ -46,8 +49,6 @@ export function WhenPanel({
   loading: boolean;
   note: string | null;
   allowedWeekdays: number[];
-  needsAddress: boolean;
-  onGoToLocation: () => void;
 }) {
   return (
     <>
@@ -80,15 +81,7 @@ export function WhenPanel({
 
       <div className="subheading">Session start time</div>
 
-      {needsAddress ? (
-        <p className="muted">
-          Times depend on where your trainer has to travel to, so add a session address
-          first.{' '}
-          <button type="button" className="text-link" onClick={onGoToLocation}>
-            Add an address →
-          </button>
-        </p>
-      ) : loading ? (
+      {loading ? (
         <p className="muted">Checking availability…</p>
       ) : (
         <>
@@ -119,7 +112,7 @@ export function WhenPanel({
         </>
       )}
 
-      {note && !needsAddress ? (
+      {note ? (
         <p className="muted" style={{ marginTop: '10px' }}>
           {note}
         </p>

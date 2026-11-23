@@ -8,10 +8,11 @@
 //     service that profile row named, which may not be the one being booked;
 //     dropping it turns a certain 404 on the quote into a visible choice in
 //     step 1.
-//   * **`address` falls back to the customer's first saved one.** Step 2 asks
-//     for a time before step 3 asks for an address, which is the client's own
-//     order, and `GET /slots` needs one — so the booking starts from the
-//     default address and the Location step re-queries when it changes.
+//   * **`address` falls back to the customer's first saved one.** Location is
+//     step 2 as of 23 Nov 2026, so the time step always has an address to
+//     query with; the fallback is what makes a returning customer's default
+//     address already selected when they get there, and changing it re-runs
+//     `GET /slots`.
 
 import type { ApiService } from '@/lib/catalog';
 import type { Package } from '@/lib/packages';

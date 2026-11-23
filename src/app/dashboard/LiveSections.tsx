@@ -51,7 +51,16 @@ export function LiveSections() {
     let cancelled = false;
     void (async () => {
       const result = await getMyBookings();
-      if (!cancelled) setBookings(result.bookings);
+      if (cancelled) return;
+
+      // A refused read means the session is over and a redirect to /login is
+      // already on its way — from `api.ts` on an expired token, or from
+      // `RequireSignIn` when there is no token at all. Staying on "Loading"
+      // for that frame is honest; "Nothing booked yet" would tell a customer
+      // their bookings are gone when they are only signed out.
+      if (result.unauthorised) return;
+
+      setBookings(result.bookings);
     })();
     return () => {
       cancelled = true;

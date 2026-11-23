@@ -15,39 +15,14 @@
 //    Next.js server for SSR and SEO, so these run on the server and the
 //    browser never sees the API host. Only the authenticated pages, which
 //    hold a token in the browser, call out from the client.
+//
+// A leaf import, deliberately: `session-expiry.ts` has no imports of its own,
+// so this file stays clear of the `'use client'` modules it would otherwise
+// have to reach into to renew a token.
 
-/**
- * Where the API lives — and it is **two different answers**, which is why this
- * is not one constant.
- *
- * In the browser the right value is the same-origin relative `/api/v1`: Nginx
- * proxies it to the API on the same host, so no CORS is needed and the API host
- * never reaches the client. On the server a relative URL is not a URL at all —
- * Node's `fetch` throws `Failed to parse URL` on it — so a server render needs
- * an absolute origin.
- *
- * The trap this avoids: `NEXT_PUBLIC_*` is inlined into the client bundle, so
- * one variable cannot hold both. Setting it to an absolute internal address
- * would make the browser call `127.0.0.1`; leaving it relative makes every
- * server fetch throw. Because `apiGet` swallows failures by rule 1 above, that
- * second case does not show up as an error — the page quietly renders the
- * static `src/data/` fallback and looks fine. It cost a deployment to find.
- *
- * So: `API_INTERNAL_URL` is server-only (never `NEXT_PUBLIC_`), points straight
- * at the API on loopback, and bypasses Nginx — which also means a basic-auth
- * gate in front of the site does not block the site's own renders.
- */
-// Defaults to 3000, the API's local port. The review VPS runs it on 4000 to
-// stay clear of another project and sets API_INTERNAL_URL explicitly in the
-// PM2 ecosystem — so the default is the one that makes `npm run dev` work with
-// no setup, and the deployment states its own.
-const SERVER_BASE_URL =
-  process.env.API_INTERNAL_URL ?? 'http://127.0.0.1:3000/api/v1';
-
-const CLIENT_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/v1';
-
-const BASE_URL =
-  typeof window === 'undefined' ? SERVER_BASE_URL : CLIENT_BASE_URL;
+/** Absolute on the server, same-origin in the browser — see that module. */
+import { BASE_URL } from './api-base-url';
+import { recoverSession } from './session-expiry';
 
 /** How long a server-side fetch may hang before the page gives up on it. */
 const TIMEOUT_MS = 8_000;
@@ -96,9 +71,24 @@ interface RequestOptions {
   body?: unknown;
 }
 
+/**
+ * A 401 that means "your session ended", not "you may not do this".
+ *
+ * It must have carried a token — a 401 on an anonymous call is the API
+ * refusing a stranger, not an expiry. `/auth/*` is excluded because logging in
+ * and refreshing answer 401 in the normal course of events, and because
+ * recovering a refresh with a refresh would loop.
+ */
+const sessionDied = (status: number, path: string, token?: string) =>
+  status === 401 &&
+  Boolean(token) &&
+  typeof window !== 'undefined' &&
+  !path.startsWith('/auth/');
+
 async function request<T>(
   path: string,
   options: RequestOptions = {},
+  retried = false,
 ): Promise<ApiOutcome<T>> {
   const { revalidate = DEFAULT_REVALIDATE, token, method = 'GET', body } = options;
 
@@ -123,6 +113,15 @@ async function request<T>(
     const envelope = (await response.json().catch(() => ({}))) as Envelope<T>;
 
     if (!response.ok || envelope.success === false) {
+      // The single place an expired session is noticed. Refresh once and
+      // retry; if there is nothing left to refresh, `recoverSession` sends the
+      // customer to the login screen rather than let a signed-out page keep
+      // drawing a signed-in shell.
+      if (!retried && sessionDied(response.status, path, token)) {
+        const fresh = await recoverSession();
+        if (fresh) return request<T>(path, { ...options, token: fresh }, true);
+      }
+
       return {
         ok: false,
         error: {

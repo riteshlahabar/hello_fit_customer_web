@@ -25,12 +25,18 @@
 // plain text rather than branches. `StaticForms.tsx` is now unrendered and kept
 // on disk, not deleted, the same way `Language.tsx` was parked.
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { refreshIdentity } from '@/lib/identity';
 import { loadProfile } from '@/lib/profile';
 import { DetailsForm } from './DetailsForm';
 import { OtpForm } from './OtpForm';
+
+/** The query cannot change under a mounted panel, so there is nothing to watch. */
+const NO_CHANGES = () => () => {};
+const searchFlag = () =>
+  new URLSearchParams(window.location.search).get('expired') === '1';
+const SERVER_FLAG = () => false;
 
 export function AuthPanel() {
   const router = useRouter();
@@ -40,6 +46,31 @@ export function AuthPanel() {
   const [needsDetails, setNeedsDetails] = useState<string | null>(null);
 
   const show = (text: string, bad = false) => setMessage({ text, bad });
+
+  /**
+   * `?expired=1` — `session-expiry.ts` sent them here, it was not their idea.
+   *
+   * Without a word of explanation an expiry looks like a bug: the customer was
+   * on their dashboard and is suddenly on a login form.
+   *
+   * **Not `useSearchParams`.** This page is prerendered, and reading the query
+   * with that hook opts the subtree out of the prerender — it needs a Suspense
+   * boundary, and whatever that boundary falls back to is what the server HTML
+   * carries. With `fallback={null}` the login form vanished from the served
+   * page entirely, which `smoke:web-session-expiry` caught.
+   *
+   * `useSyncExternalStore` instead, the same way `LiveGreeting` reads the
+   * reader's clock: a `false` server snapshot, the real answer on the client,
+   * and React reconciles the two without a hydration warning. A boolean, not
+   * an object, or the snapshot would never settle. Nothing to subscribe to —
+   * the flag cannot change without a navigation.
+   */
+  const expired = useSyncExternalStore(NO_CHANGES, searchFlag, SERVER_FLAG);
+  const shown =
+    message ??
+    (expired
+      ? { text: 'Your session has ended. Please sign in again.', bad: false }
+      : null);
 
   /**
    * Where a verified code lands: the dashboard, or the details step first.
@@ -95,11 +126,11 @@ export function AuthPanel() {
       <div
         id="message"
         className={
-          message ? `message show ${message.bad ? 'error' : 'success'}` : 'message'
+          shown ? `message show ${shown.bad ? 'error' : 'success'}` : 'message'
         }
         role="status"
         aria-live="polite">
-        {message?.text ?? ''}
+        {shown?.text ?? ''}
       </div>
 
       {needsDetails ? (

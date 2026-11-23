@@ -18,6 +18,7 @@
 'use client';
 
 import { apiSend } from './api';
+import { setSessionRefresher } from './session-expiry';
 
 const ACCESS_KEY = 'hf_customer_access_token';
 const REFRESH_KEY = 'hf_customer_refresh_token';
@@ -135,6 +136,26 @@ export async function refreshSession(): Promise<boolean> {
   tokenStore.save(result.data);
   return true;
 }
+
+/**
+ * Wire the refresh into every authenticated request.
+ *
+ * **This is what stops the 15-minute logout.** `refreshSession` was written
+ * with the login flow and then never called by anything, so the access token
+ * simply died after `JWT_ACCESS_TTL` and the signed-in pages started coming
+ * back 401 — silently, because each page turned the refusal into a dash or an
+ * empty panel. The refresh token is good for 30 days; nothing was spending it.
+ *
+ * `api.ts` now asks for a fresh token on any 401 that carried one, retries the
+ * request once, and ejects to `/login?expired=1` when this returns `null` —
+ * which `refreshSession` has already made the right answer by clearing both
+ * tokens when the refresh itself is refused.
+ *
+ * Registered at module scope because every module that sends a token imports
+ * `tokenStore` from this file, so in the browser this line has run before any
+ * authenticated request can fail.
+ */
+setSessionRefresher(async () => ((await refreshSession()) ? tokenStore.access : null));
 
 /**
  * Sign out — PDF §3.1 and §5.1, whose acceptance criteria say the customer can

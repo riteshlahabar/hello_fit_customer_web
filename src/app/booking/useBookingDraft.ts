@@ -33,8 +33,6 @@ export interface RawDraft {
   date: string;
   slot: Slot | null;
   addressId: string;
-  goal: string;
-  level: string;
   notes: string;
   error: string | null;
 }
@@ -50,8 +48,6 @@ export function useBookingDraft() {
   const [date, setDate] = useState('');
   const [slot, setSlot] = useState<Slot | null>(null);
   const [addressId, setAddressId] = useState('');
-  const [goal, setGoal] = useState('Improve flexibility');
-  const [level, setLevel] = useState('Beginner');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -78,8 +74,6 @@ export function useBookingDraft() {
     date: date || days[0] || '',
     slot,
     addressId,
-    goal,
-    level,
     notes,
     error,
   };
@@ -89,8 +83,6 @@ export function useBookingDraft() {
     setStep,
     setPackageId,
     setSlot,
-    setGoal,
-    setLevel,
     setNotes,
     setError,
     chooseDate,

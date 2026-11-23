@@ -76,8 +76,6 @@ export function checkoutQuery(raw: RawDraft, resolved: Resolved): string {
     date: raw.date,
     from: String(raw.slot.fromMinute),
     to: String(raw.slot.toMinute),
-    goal: raw.goal,
-    level: raw.level,
     ...(raw.notes.trim() ? { notes: raw.notes.trim() } : {}),
     // Checkout is what calls `POST /bookings`, so the chosen trainer has to
     // survive the hand-off: dropped here, the customer would pick a trainer,

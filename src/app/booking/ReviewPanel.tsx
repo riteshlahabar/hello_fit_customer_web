@@ -22,8 +22,6 @@ export function ReviewPanel({
   date,
   slot,
   address,
-  goal,
-  level,
 }: {
   who: { name: string; email: string; mobile: string };
   service: ApiService | null;
@@ -31,8 +29,6 @@ export function ReviewPanel({
   date: string;
   slot: Slot | null;
   address: ApiAddress | null;
-  goal: string;
-  level: string;
 }) {
   return (
     <>
@@ -71,14 +67,6 @@ export function ReviewPanel({
               '—'
             )}
           </dd>
-        </div>
-        <div>
-          <dt>Goal</dt>
-          <dd>{goal}</dd>
-        </div>
-        <div>
-          <dt>Experience</dt>
-          <dd>{level}</dd>
         </div>
       </dl>
 

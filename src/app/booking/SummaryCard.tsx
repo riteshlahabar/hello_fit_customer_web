@@ -26,6 +26,12 @@ export function SummaryCard({
   quote,
   onContinue,
   ready,
+  /**
+   * Only step 4 offers payment (client, 23-11-2026). The card is beside every
+   * step, so without this the button sat next to "choose a service" — two
+   * ways forward on the same screen, one of them skipping the review.
+   */
+  showContinue,
 }: {
   service: ApiService | null;
   pack: Package | null;
@@ -35,6 +41,7 @@ export function SummaryCard({
   quote: Quote | null;
   onContinue: () => void;
   ready: boolean;
+  showContinue: boolean;
 }) {
   return (
     <aside>
@@ -94,13 +101,17 @@ export function SummaryCard({
           </div>
         </div>
 
-        <button className="btn primary" disabled={!ready} onClick={onContinue}>
-          Continue to Payment ↗
-        </button>
-        <p className="terms">
-          By continuing, you agree to the booking terms and cancellation policy shown at
-          checkout.
-        </p>
+        {showContinue ? (
+          <>
+            <button className="btn primary" disabled={!ready} onClick={onContinue}>
+              Continue to Payment ↗
+            </button>
+            <p className="terms">
+              By continuing, you agree to the booking terms and cancellation policy shown
+              at checkout.
+            </p>
+          </>
+        ) : null}
         <div className="secure">♧ Secure checkout</div>
       </section>
 

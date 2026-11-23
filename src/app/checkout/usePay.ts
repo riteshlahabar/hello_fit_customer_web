@@ -47,8 +47,6 @@ export interface PayInput {
   toMinute: number;
   trainerId: string;
   coupon: string;
-  goal: string;
-  level: string;
   notes: string;
   method: Method;
   who: { name: string; email: string; mobile: string };
@@ -83,11 +81,9 @@ export function usePay(input: PayInput) {
       ...(input.packageId ? { packageId: input.packageId } : {}),
       ...(input.trainerId ? { instructorId: input.trainerId } : {}),
       ...(input.coupon ? { couponCode: input.coupon } : {}),
-      preferences: {
-        goal: input.goal,
-        level: input.level,
-        ...(input.notes ? { note: input.notes } : {}),
-      },
+      ...(input.notes
+        ? { preferences: { note: input.notes } }
+        : {}),
     });
 
     if (!created.booking) {

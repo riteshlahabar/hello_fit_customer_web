@@ -35,9 +35,6 @@ export interface BookingContextProps {
   packageId?: string;
 }
 
-/** "₹850" — whole rupees, the way every price on the site is written. */
-const rupees = (value: number) => `₹${Math.round(value).toLocaleString('en-IN')}`;
-
 export function ProviderResultCard({
   provider,
   initiallySaved = false,
@@ -113,26 +110,21 @@ export function ProviderResultCard({
 
         {provider.headline ? <p className="trainer-bio">{provider.headline}</p> : null}
 
+        {/* **No price on the card** (client, 23-11-2026): "Select trainer"
+            takes the price slot and "View profile" stays where it was. Admin
+            sets every price, and the figure the customer acts on is the
+            booking quote — a "from ₹x" here is a second number that can
+            disagree with it. */}
         <div className="card-bottom">
-          <div className="price">
-            {provider.fromPrice === null ? (
-              <small>Price on request</small>
-            ) : (
-              <>
-                {rupees(provider.fromPrice)} <small>/ session</small>
-              </>
-            )}
-          </div>
-
           {bookHref ? (
-            <div className="card-actions">
+            <>
               <Link className="btn dark" href={bookHref}>
                 Select trainer ↗
               </Link>
               <Link className="text-link" href={profileHref}>
                 View profile
               </Link>
-            </div>
+            </>
           ) : (
             <Link className="btn dark" href={profileHref}>
               View Profile ↗

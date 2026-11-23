@@ -3,7 +3,7 @@
 // Live checkout and payment (PDF §5.8 / US-W09).
 //
 // What arrives in the URL is the whole booking: the service, **the package**,
-// the address, the day, the start and end minute, the goal, the level, the
+// the address, the day, the start and end minute, the
 // note and the chosen trainer. The package is the one that was missing until
 // 21 Nov 2026 — without it every quote came back as one session of
 // `Service.basePrice`, which is what the client saw as "it shows the base
@@ -36,8 +36,6 @@ export function Checkout() {
   const sessionDate = params.get('date') ?? '';
   const fromMinute = Number(params.get('from') ?? '0');
   const toMinute = Number(params.get('to') ?? '0');
-  const goal = params.get('goal') ?? '';
-  const level = params.get('level') ?? '';
   const notes = params.get('notes') ?? '';
   /**
    * The trainer chosen on the profile or the search page, forwarded by the
@@ -72,8 +70,6 @@ export function Checkout() {
     toMinute,
     trainerId,
     coupon: applied,
-    goal,
-    level,
     notes,
     method,
     who: data.who,

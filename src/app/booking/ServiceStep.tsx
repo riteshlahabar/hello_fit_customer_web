@@ -1,7 +1,6 @@
 'use client';
 
-// Step 1's body — the trainer, the service, the package, and the two
-// questions the design collects about the session itself.
+// Step 1's body — the trainer, the service and the package.
 //
 // Client, 21 Nov 2026: "there is four tabs — choose service; in this, your
 // trainer: we already select trainer according to service, show this trainer
@@ -9,9 +8,11 @@
 // the service which is selected first, and give option change service and
 // return to package selection."
 //
-// The goal and the level stay where the design draws them and travel with
-// the booking in its `preferences` column — the trainer app reads the goal
-// and the notes on `GET /requests`.
+// **The goal and the experience-level selects were removed on 23-11-2026**
+// (client). They were the design's, not the PDF's, and they were the only
+// thing step 1 asked that the booking did not need — `preferences` now
+// carries just the note the Location step collects, which is what the trainer
+// app reads on `GET /requests`.
 
 import { ChosenTrainer } from './ChosenTrainer';
 import { ChosenService } from './ChosenService';
@@ -26,10 +27,6 @@ export function ServiceStep({
   packages,
   packageId,
   onPackage,
-  goal,
-  onGoal,
-  level,
-  onLevel,
 }: {
   trainerId: string;
   changeTrainerHref: string;
@@ -38,10 +35,6 @@ export function ServiceStep({
   packages: Package[];
   packageId: string;
   onPackage: (id: string) => void;
-  goal: string;
-  onGoal: (value: string) => void;
-  level: string;
-  onLevel: (value: string) => void;
 }) {
   return (
     <>
@@ -64,26 +57,6 @@ export function ServiceStep({
         />
       )}
 
-      <div className="field-grid" style={{ marginTop: '17px' }}>
-        <div className="field">
-          <label htmlFor="goal">What is your main goal?</label>
-          <select id="goal" value={goal} onChange={(e) => onGoal(e.target.value)}>
-            <option>Improve flexibility</option>
-            <option>Build strength</option>
-            <option>Reduce stress</option>
-            <option>Beginner routine</option>
-            <option>General fitness</option>
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="level">Your experience level</label>
-          <select id="level" value={level} onChange={(e) => onLevel(e.target.value)}>
-            <option>Beginner</option>
-            <option>Intermediate</option>
-            <option>Advanced</option>
-          </select>
-        </div>
-      </div>
     </>
   );
 }

@@ -58,19 +58,20 @@ export function TrainerCard({ trainer }: { trainer: ProviderCard }) {
           ) : null}
         </div>
 
+        {/* No price (client, 23-11-2026) — same reason as the search card:
+            admin sets pricing and the quote is the only figure to act on.
+            "Select trainer" takes the price slot; the homepage card has no
+            service chosen yet, so it goes to the trainer's profile with the
+            service list, and "View profile" is unchanged beside it. */}
         <div className="trainer-meta">
-          <div className="price">
-            {trainer.fromPrice === null ? (
-              <small>Price on request</small>
-            ) : (
-              <>
-                ₹{Math.round(trainer.fromPrice).toLocaleString('en-IN')}{' '}
-                <small>/ session</small>
-              </>
-            )}
-          </div>
-          <Link className="btn btn-dark" href={`/trainer-profile?id=${trainer.id}`}>
-            View profile ↗
+          <Link
+            className="btn btn-dark"
+            href={`/trainer-profile?id=${trainer.id}#services`}
+          >
+            Select trainer ↗
+          </Link>
+          <Link className="text-link" href={`/trainer-profile?id=${trainer.id}`}>
+            View profile
           </Link>
         </div>
       </div>

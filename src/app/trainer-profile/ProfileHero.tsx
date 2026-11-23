@@ -20,7 +20,7 @@ import Link from 'next/link';
 import { TrainerPhoto } from '@/components/TrainerPhoto';
 import { SaveHeart } from '@/components/trainers/SaveHeart';
 import type { ProviderProfile } from '@/lib/provider-profile';
-import { rupees, starRow } from './bits';
+import { starRow } from './bits';
 
 export function ProfileHero({
   provider,
@@ -33,9 +33,6 @@ export function ProfileHero({
   bookHref: string;
 }) {
   const category = provider.services[0]?.category?.name;
-  const fromPrice = provider.services.length
-    ? Math.min(...provider.services.map((service) => service.price))
-    : null;
   const city = provider.areas[0]?.city?.name;
   const rated = provider.ratingCount > 0;
 
@@ -118,21 +115,11 @@ export function ProfileHero({
       </div>
 
       <aside className="book-card" id="bookingCard">
+        {/* No price here (client, 23-11-2026). Pricing is the admin's, not the
+            provider's, and a "from ₹x" on the profile is a second number
+            beside the one the booking quote returns. */}
         <div>
-          <div className="price">
-            {fromPrice === null ? (
-              'Price on request'
-            ) : (
-              <>
-                {rupees(fromPrice)} <small>/ session</small>
-              </>
-            )}
-          </div>
-          <p>
-            {fromPrice === null
-              ? 'This trainer has not published a price yet.'
-              : 'Starting price. Choose a service and a time to continue.'}
-          </p>
+          <p>Choose a service and a time to continue.</p>
         </div>
         <Link className="btn primary" href={bookHref}>
           Check Availability ↗

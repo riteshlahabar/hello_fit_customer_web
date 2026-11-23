@@ -4,7 +4,6 @@ import { getProvider, getProviderReviews } from '@/lib/provider-profile';
 import { ProfileHero } from './ProfileHero';
 import { ProfileTabs } from './ProfileTabs';
 import { ProfileSide } from './ProfileSide';
-import { rupees } from './bits';
 import './page.css';
 
 /**
@@ -137,8 +136,6 @@ export default async function TrainerProfilePage({
                           </p>
                         </div>
                         <div className="service-price">
-                          {rupees(service.price)}
-                          <small>per session</small>
                           <Link
                             className="btn primary"
                             href={serviceHref(service.id)}

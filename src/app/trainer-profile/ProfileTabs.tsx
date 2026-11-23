@@ -19,7 +19,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import type { ProviderProfile, ProviderReviewsPayload } from '@/lib/provider-profile';
 import { ProfileReviews } from './ProfileReviews';
-import { minutes, rupees, titleCase } from './bits';
+import { minutes, titleCase } from './bits';
 
 type Tab = 'about' | 'services' | 'availability' | 'reviews';
 
@@ -107,10 +107,7 @@ export function ProfileTabs({
           <p>This trainer has no approved services yet.</p>
         ) : (
           <>
-            <p>
-              Each price is this trainer’s own for that service. Choose one to
-              continue to booking.
-            </p>
+            <p>Choose a service to continue to booking.</p>
             <div className="service-list">
               {provider.services.map((service) => (
                 <div className="service-item" key={service.offeringId}>
@@ -131,10 +128,6 @@ export function ProfileTabs({
                     >
                       Choose this service
                     </Link>
-                  </div>
-                  <div className="service-price">
-                    {rupees(service.price)}
-                    <small>per session</small>
                   </div>
                 </div>
               ))}

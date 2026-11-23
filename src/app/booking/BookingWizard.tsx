@@ -111,10 +111,6 @@ export function BookingWizard() {
                 packages={data.packages}
                 packageId={resolved.livePackageId}
                 onPackage={draft.setPackageId}
-                goal={raw.goal}
-                onGoal={draft.setGoal}
-                level={raw.level}
-                onLevel={draft.setLevel}
               />
             ) : null}
 
@@ -151,8 +147,6 @@ export function BookingWizard() {
                 date={raw.date}
                 slot={raw.slot}
                 address={resolved.address}
-                goal={raw.goal}
-                level={raw.level}
               />
             ) : null}
           </section>
@@ -194,6 +188,7 @@ export function BookingWizard() {
           quote={data.quote}
           ready={resolved.complete}
           onContinue={toCheckout}
+          showContinue={raw.step === 4}
         />
       </div>
     </>

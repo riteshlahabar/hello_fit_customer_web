@@ -9,51 +9,43 @@
 // Wiring them would mean inventing backend scope.
 //
 // Markup, classes and ids are the demo's throughout.
+//
+// **The clock (23-11-2026).** The countdown used to be computed once per page
+// load, and "next session" meant the earliest `upcoming` booking by date —
+// so today's session stayed on the dashboard, frozen at zero, long after it
+// had finished, and only a reload moved it on. Now `useNow` ticks every
+// second, a session counts as past once its **end** time has gone, and the
+// card rolls on to the one after it by itself.
 
 import { useEffect, useState } from 'react';
-import { formatBookingDate, money, type Booking } from '@/data/bookings';
+import { money, type Booking } from '@/data/bookings';
 import { getMyBookings } from '@/lib/bookings';
+import { byStart, sessionWindow } from '@/lib/clock';
+import { NextSessionCard } from './NextSessionCard';
+import { useNow } from './useNow';
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
-/** Soonest upcoming session first — the one the countdown is about. */
-const nextOf = (rows: Booking[]) =>
-  rows
-    .filter((b) => b.status === 'upcoming')
-    .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
-
 /**
- * Whole days/hours/minutes until a session starts.
+ * The sessions still ahead of the customer, soonest first.
  *
- * Built from the date and the "08:00 AM" string rather than `new Date(iso)`:
- * the date is a calendar day, and parsing it as an instant shifts it a day in
- * any UTC+ timezone — the trap `src/data/bookings.ts` already warns about.
+ * Two things the old `status === 'upcoming'` filter got wrong:
+ *
+ * * **The end, not the start.** A session in progress is still the next
+ *   session; one whose end time has passed is not, whatever the API still
+ *   says — the status only turns `COMPLETED` when the trainer or the cron
+ *   marks it, which can be hours later.
+ * * **The time, not just the day.** Two sessions on one day were previously
+ *   left in whatever order the API returned them.
  */
-function countdownTo(booking: Booking) {
-  const [y, m, d] = booking.date.split('-').map(Number);
-  const match = /^(\d{2}):(\d{2})\s*(AM|PM)$/i.exec(booking.time);
-
-  let hour = 0;
-  let minute = 0;
-
-  if (match) {
-    hour = Number(match[1]) % 12;
-    minute = Number(match[2]);
-    if (match[3].toUpperCase() === 'PM') hour += 12;
-  }
-
-  const starts = new Date(y, m - 1, d, hour, minute).getTime();
-  const left = Math.max(0, starts - Date.now());
-
-  return {
-    days: String(Math.floor(left / 86_400_000)).padStart(2, '0'),
-    hours: String(Math.floor((left / 3_600_000) % 24)).padStart(2, '0'),
-    mins: String(Math.floor((left / 60_000) % 60)).padStart(2, '0'),
-  };
-}
+const stillAhead = (rows: Booking[], now: number) =>
+  rows
+    .filter((b) => b.status === 'upcoming' && sessionWindow(b).end > now)
+    .sort(byStart);
 
 export function LiveSections() {
   const [bookings, setBookings] = useState<Booking[] | null>(null);
+  const now = useNow();
 
   useEffect(() => {
     let cancelled = false;
@@ -68,8 +60,8 @@ export function LiveSections() {
 
   if (bookings === null) return <div className="upcoming">Loading your sessions…</div>;
 
-  const next = nextOf(bookings);
-  const upcoming = bookings.filter((b) => b.status === 'upcoming').slice(0, 4);
+  const ahead = stillAhead(bookings, now);
+  const next = ahead[0];
 
   if (!next) {
     return (
@@ -89,73 +81,14 @@ export function LiveSections() {
     );
   }
 
-  const left = countdownTo(next);
-
   return (
     <>
       <div className="upcoming">
-        <div className="session-card">
-          <div className="session-top">
-            <span className="pill">
-              <span className="dot"></span> UPCOMING SESSION
-            </span>
-            <span style={{ fontSize: '11px', color: '#d7d1cb' }}>BOOKING #{next.id}</span>
-          </div>
-          <div>
-            <h3>{next.service}</h3>
-            <p>{next.duration} · {next.location}</p>
-          </div>
-          <div className="session-bottom">
-            <div className="trainer-mini">
-              <div className="trainer-avatar">{next.initials}</div>
-              <div>
-                <strong>{next.trainer}</strong>
-                <small>{next.payment}</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="countdown">
-          <div className="countdown-head">
-            <strong>Session starts in</strong>
-            <span>{formatBookingDate(next.date).toUpperCase()}</span>
-          </div>
-          <div className="count-grid">
-            <div className="count-cell">
-              <strong id="days">{left.days}</strong>
-              <small>DAYS</small>
-            </div>
-            <div className="count-cell">
-              <strong id="hours">{left.hours}</strong>
-              <small>HOURS</small>
-            </div>
-            <div className="count-cell">
-              <strong id="mins">{left.mins}</strong>
-              <small>MINUTES</small>
-            </div>
-          </div>
-          <div>
-            <div className="detail-line">
-              <span>◷</span>
-              <span>
-                <b>{formatBookingDate(next.date)}</b>
-                <br />
-                {next.time}
-              </span>
-            </div>
-            <div className="detail-line">
-              <span>⌖</span>
-              <span>
-                <b>{next.location}</b>
-              </span>
-            </div>
-          </div>
-        </div>
+        <NextSessionCard booking={next} now={now} />
       </div>
 
       <div className="booking-list" id="upcomingList">
-        {upcoming.map((b) => {
+        {ahead.slice(0, 4).map((b) => {
           const [, month, day] = b.date.split('-');
           return (
             <div className="booking-row" key={b.id}>

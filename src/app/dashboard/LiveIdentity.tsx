@@ -80,11 +80,13 @@ export function LiveUserMini() {
  * (audit item 19). So the target, the percentage and the progress bar are
  * blank, and the sentence no longer claims a target the customer never set.
  *
- * `withCta` is the overview copy, which carries a "Book next session" button;
- * the Fitness Goals panel shows the same card without it. Both were separate
- * hardcoded blocks in the demo.
+ * The demo's overview copy carried a "Book next session" button under the
+ * card (`withCta`). **Removed 23-11-2026 on the client's word** — "Book a
+ * session" already sits at the top of the same panel, so the second button
+ * was a duplicate. Both panels now draw the same card, so the prop is gone
+ * with it; `.goal-cta` stays in `page.css` as converted demo styling.
  */
-export function LiveGoalCard({ withCta = false }: { withCta?: boolean }) {
+export function LiveGoalCard() {
   const { completed } = useIdentity();
 
   return (
@@ -93,11 +95,6 @@ export function LiveGoalCard({ withCta = false }: { withCta?: boolean }) {
       <p>Session goals are not set up on your account yet.</p>
       <div className="progress"><span style={{ width: 0 }}></span></div>
       <div className="goal-meta"><span>{completed} completed</span><span>No goal set</span></div>
-      {withCta && (
-        <div className="goal-cta">
-          <button className="primary" id="goalBook">Book next session</button>
-        </div>
-      )}
     </div>
   );
 }

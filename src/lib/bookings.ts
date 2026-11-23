@@ -48,6 +48,26 @@ const DEAD = new Set([
   'NO_SHOW_TEACHER',
 ]);
 
+const over = (session: ApiSession) => DONE.has(session.status) || DEAD.has(session.status);
+
+/** Chronological, the way the customer reads a package. */
+const byWhen = (a: ApiSession, b: ApiSession) =>
+  a.sessionDate.localeCompare(b.sessionDate) || a.fromMinute - b.fromMinute;
+
+/**
+ * The occurrence a booking row should be drawn from: its earliest session
+ * that is still live, or — when every one is done or dead — the last that
+ * ran.
+ *
+ * `sessions[0]` was wrong for a package (23-11-2026): the dashboard kept
+ * showing session 1, with a countdown stuck at zero, for the whole month
+ * after that session finished.
+ */
+function shownSession(sessions: ApiSession[]): ApiSession | undefined {
+  const ordered = [...sessions].sort(byWhen);
+  return ordered.find((session) => !over(session)) ?? ordered[ordered.length - 1];
+}
+
 function rollUpStatus(sessions: ApiSession[]): BookingStatus {
   if (sessions.length === 0) return 'cancelled';
 
@@ -85,30 +105,31 @@ const emojiFor = (service: string) =>
   EMOJI.find(([pattern]) => pattern.test(service))?.[1] ?? '🏃';
 
 function toBooking(row: ApiBooking): Booking {
-  const first = row.sessions[0];
-  const trainer = first?.instructor?.name ?? 'Awaiting assignment';
+  const shown = shownSession(row.sessions);
+  const trainer = shown?.instructor?.name ?? 'Awaiting assignment';
   const service = row.service?.name ?? 'Session';
 
   // `sessionDate` is a date column; the API serialises it as an ISO instant,
   // so only the day part is taken. Never `new Date(...)` on it — that is the
   // off-by-one in the backend's calendar.ts note.
-  const date = (first?.sessionDate ?? row.createdAt).slice(0, 10);
+  const date = (shown?.sessionDate ?? row.createdAt).slice(0, 10);
 
   const minutes =
-    first && first.toMinute > first.fromMinute
-      ? first.toMinute - first.fromMinute
+    shown && shown.toMinute > shown.fromMinute
+      ? shown.toMinute - shown.fromMinute
       : (row.service?.durationMin ?? 60);
 
   return {
     id: row.code,
     bookingId: row.id,
     ...(row.service?.id ? { serviceId: row.service.id } : {}),
-    ...(first?.instructor?.id ? { instructorId: first.instructor.id } : {}),
+    ...(shown?.instructor?.id ? { instructorId: shown.instructor.id } : {}),
     trainer,
-    initials: first?.instructor ? initialsOf(trainer) : '–',
+    initials: shown?.instructor ? initialsOf(trainer) : '–',
     service,
     date,
-    time: first ? clock(first.fromMinute) : '—',
+    time: shown ? clock(shown.fromMinute) : '—',
+    ...(shown ? { fromMinute: shown.fromMinute, toMinute: shown.toMinute } : {}),
     duration: `${minutes} min`,
     location: row.address?.label ?? 'At your home',
     price: Number(row.payable),

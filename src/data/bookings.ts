@@ -30,6 +30,14 @@ export type Booking = {
   /** ISO calendar date — a day, not an instant. See the backend's calendar.ts note. */
   date: string;
   time: string;
+  /**
+   * The shown session's start and end as minutes from midnight — the unit the
+   * slot engine stores, and the only honest input for a countdown (`time` is
+   * a printed string and `duration` is prose). Absent on the static fallback
+   * rows below, where `lib/clock.ts` parses the strings instead.
+   */
+  fromMinute?: number;
+  toMinute?: number;
   duration: string;
   location: string;
   price: number;

@@ -32,6 +32,11 @@
 [data-hf-page="dashboard"] .stat small {color:var(--muted);display:block;font-size:11px}
 [data-hf-page="dashboard"] .stat strong {font-size:25px;display:block;line-height:1.35}
 [data-hf-page="dashboard"] .section {background:white;border:1px solid var(--line);border-radius:19px;padding:22px;margin-bottom:22px;box-shadow:var(--shadow)}
+/* A nested card ("Your monthly goal" inside "Your next session") needs its own
+   top gap — .section only carries margin-bottom, so without this it sits flush
+   against the booking row above it. Its bottom margin would double up with the
+   parent's padding, so it goes. */
+[data-hf-page="dashboard"] .section .section {margin-top:22px;margin-bottom:0}
 [data-hf-page="dashboard"] .section-head {display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
 [data-hf-page="dashboard"] .section-head h2 {font-size:18px;margin:0;letter-spacing:-.5px}
 [data-hf-page="dashboard"] .section-head p {margin:4px 0 0;color:var(--muted);font-size:12px}
@@ -128,6 +133,7 @@
 [data-hf-page="dashboard"] .stat:last-child {grid-column:span 2}
 [data-hf-page="dashboard"] .stat strong {font-size:22px}
 [data-hf-page="dashboard"] .section {padding:16px;border-radius:16px}
+[data-hf-page="dashboard"] .section .section {margin-top:16px}
 [data-hf-page="dashboard"] .session-card {padding:18px}
 [data-hf-page="dashboard"] .session-card h3 {font-size:23px}
 [data-hf-page="dashboard"] .session-bottom {align-items:flex-start;flex-direction:column}

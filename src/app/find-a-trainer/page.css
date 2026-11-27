@@ -69,9 +69,7 @@
 [data-hf-page="find-a-trainer"] .rating-filter button {background:#fffaf5;border:1px solid var(--line);border-radius:8px;padding:7px;font-size:10px}
 [data-hf-page="find-a-trainer"] .rating-filter button.active {background:#fff0ec;border-color:var(--orange);color:var(--orange)}
 [data-hf-page="find-a-trainer"] .results-head {display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:15px}
-[data-hf-page="find-a-trainer"] .results-head h2 {font:400 30px/1 Anton,sans-serif;text-transform:uppercase;margin:0}
-[data-hf-page="find-a-trainer"] .results-head h2 span {color:var(--orange)}
-[data-hf-page="find-a-trainer"] .results-head p {color:var(--muted);font-size:10px;margin:6px 0 0}
+[data-hf-page="find-a-trainer"] .results-head p {color:var(--muted);font-size:10px;margin:0}
 [data-hf-page="find-a-trainer"] .sort {display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}
 [data-hf-page="find-a-trainer"] .sort select {background:white;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:10px;color:var(--ink)}
 [data-hf-page="find-a-trainer"] .active-filters {display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:15px}
@@ -106,7 +104,7 @@
 [data-hf-page="find-a-trainer"] .pagination {display:flex;justify-content:center;align-items:center;gap:7px;padding:25px 0 45px}
 [data-hf-page="find-a-trainer"] .pagination button {width:34px;height:34px;border:1px solid var(--line);background:white;border-radius:9px;font-size:10px}
 [data-hf-page="find-a-trainer"] .pagination button.active, [data-hf-page="find-a-trainer"] .pagination button:hover {background:var(--orange);color:white;border-color:var(--orange)}
-[data-hf-page="find-a-trainer"] .cta {background:var(--orange);color:white;border-radius:20px;padding:29px 34px;display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:55px;position:relative;overflow:hidden}
+[data-hf-page="find-a-trainer"] .cta {background:var(--orange);color:white;border-radius:20px;padding:29px 34px;display:flex;align-items:center;justify-content:space-between;gap:25px;margin-top:34px;margin-bottom:55px;position:relative;overflow:hidden}
 [data-hf-page="find-a-trainer"] .cta:after {content:"FIT";position:absolute;right:20%;top:-60px;font:400 190px Anton,sans-serif;color:#ffffff12}
 [data-hf-page="find-a-trainer"] .cta h2 {font:400 31px/1.1 Anton,sans-serif;text-transform:uppercase;margin:0 0 7px;position:relative;z-index:1}
 [data-hf-page="find-a-trainer"] .cta p {font-size:11px;color:#ffe2dc;margin:0;position:relative;z-index:1}

@@ -116,9 +116,9 @@ export function TrainerSearch({
         <section className="results-area">
           <div className="results-head">
             <div>
-              <h2>
-                Explore <span>Trainers</span>
-              </h2>
+              {/* The "Explore Trainers" heading was removed on the client's
+                  word (27 Nov 2026) — the count line below says what the list
+                  is, and the page already has one <h1> in the hero. */}
               <p>
                 {loading
                   ? 'Searching…'

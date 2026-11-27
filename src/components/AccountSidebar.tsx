@@ -1,9 +1,11 @@
-// The account sidebar, for the pages that are their own route.
+// The account sidebar — now the only one, on every signed-in page.
 //
-// The dashboard draws this sidebar itself, and its buttons switch panels
-// inside that one page (`DashboardNav`). Billing and Refunds are separate
-// routes, so clicking through to them used to leave the sidebar behind — this
-// keeps it on screen, with every row a real link.
+// It used to serve Billing and Refunds while the dashboard drew its own copy
+// whose rows switched panels inside that single page. That split is what made
+// My Bookings behave differently depending on which menu you came from, so the
+// client had it removed (27-11-2026): every row here is a real link to a real
+// route, the dashboard renders this component like everything else, and no
+// account page opens without a sidebar.
 //
 // Its CSS is **unscoped and self-contained** (`account-sidebar.css`) because
 // each converted page scopes its own rules to `[data-hf-page="…"]`; borrowing
@@ -14,7 +16,9 @@ import { AccountUserMini } from './AccountUserMini';
 import './account-sidebar.css';
 
 const SPACE = [
-  ['/dashboard', '⌂', 'Overview'],
+  // "Overview" renamed on the client's word, 27-11-2026: the row leads to the
+  // page everything else calls the dashboard, and two names for it confused.
+  ['/dashboard', '⌂', 'Dashboard'],
   ['/my-bookings', '▦', 'My Bookings'],
   ['/saved-trainers', '♡', 'Saved Trainers'],
   ['/goals', '◎', 'Fitness Goals'],
@@ -22,6 +26,10 @@ const SPACE = [
 
 const ACCOUNT = [
   ['/profile', '♙', 'My Profile'],
+  // Lifted out of the profile page's own tab strip (client, 27-11-2026).
+  // `/notifications` already existed and is already wired to the API; the two
+  // other notification panels on the site were dead copies and are deleted.
+  ['/notifications', '♧', 'Notifications'],
   ['/billing', '🧾', 'Billing History'],
   ['/refunds', '↩', 'Refunds'],
 ];

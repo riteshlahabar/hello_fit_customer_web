@@ -13,20 +13,10 @@
 [data-hf-page="profile"] .help {color:#625d57;text-decoration:none;font-size:13px}
 [data-hf-page="profile"] .avatar {width:42px;height:42px;border-radius:50%;background:#f5d9cc;color:#87372a;display:grid;place-items:center;font-weight:800;overflow:hidden}
 [data-hf-page="profile"] .avatar img {width:100%;height:100%;object-fit:cover}
-[data-hf-page="profile"] .layout {max-width:1400px;margin:auto;padding:30px 4.5%;display:grid;grid-template-columns:245px minmax(0,1fr);gap:28px}
-[data-hf-page="profile"] .sidebar {background:white;border:1px solid var(--line);border-radius:20px;padding:22px 14px;height:max-content;position:sticky;top:98px}
-[data-hf-page="profile"] .user-mini {display:flex;align-items:center;gap:12px;padding:3px 10px 22px;border-bottom:1px solid var(--line);margin-bottom:17px}
-[data-hf-page="profile"] .user-pic {width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#f8d8ca;color:#8d3a2c;font-weight:800;font-size:17px;overflow:hidden}
-[data-hf-page="profile"] .user-pic img {width:100%;height:100%;object-fit:cover}
-[data-hf-page="profile"] .user-mini strong {display:block;font-size:13px}
-[data-hf-page="profile"] .user-mini small {display:block;color:var(--muted);font-size:11px;margin-top:3px}
-[data-hf-page="profile"] .nav-label {font-size:10px;letter-spacing:1.7px;color:#a39b92;font-weight:700;padding:10px 12px}
-[data-hf-page="profile"] .nav-btn {width:100%;display:flex;align-items:center;gap:12px;padding:12px;border:0;background:transparent;border-radius:11px;text-align:left;color:#625d57;font-weight:500;margin:2px 0}
-[data-hf-page="profile"] .nav-btn .ico {font-size:17px;width:22px;text-align:center}
-[data-hf-page="profile"] .nav-btn.active, [data-hf-page="profile"] .nav-btn:hover {background:#fff0e8;color:var(--orange);font-weight:700}
-[data-hf-page="profile"] .sidebar-bottom {margin-top:25px;padding:15px 12px;background:var(--cream);border-radius:14px}
-[data-hf-page="profile"] .sidebar-bottom strong {font-size:12px}
-[data-hf-page="profile"] .sidebar-bottom p {font-size:11px;line-height:1.6;color:#777;margin:6px 0 12px}
+/* The grid itself now comes from `components/account-sidebar.css`
+   (`.hf-account-shell`), so the sidebar hides at the same width it does on
+   Billing and Refunds. This keeps only the page frame. */
+[data-hf-page="profile"] .layout {max-width:1400px;margin:auto;padding:30px 4.5%}
 [data-hf-page="profile"] .text-link {border:0;background:none;color:var(--orange);font-weight:700;font-size:12px;padding:0}
 [data-hf-page="profile"] .main {min-width:0}
 [data-hf-page="profile"] .welcome {display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:23px}
@@ -85,9 +75,7 @@
 [data-hf-page="profile"] .mobile-menu {display:none;border:0;background:#fff0e8;color:var(--orange);padding:9px 12px;border-radius:9px;font-weight:800}
 [data-hf-page="profile"] .footnote {text-align:center;font-size:11px;color:#a49b91;padding:10px 0 22px}
 @media(max-width:900px) {
-[data-hf-page="profile"] .layout {grid-template-columns:1fr;padding-top:18px}
-[data-hf-page="profile"] .sidebar {position:static;display:none}
-[data-hf-page="profile"] .sidebar.open {display:block}
+[data-hf-page="profile"] .layout {padding-top:18px}
 [data-hf-page="profile"] .mobile-menu {display:block}
 [data-hf-page="profile"] .welcome {align-items:flex-start}
 [data-hf-page="profile"] .welcome .status {display:none}
@@ -109,3 +97,11 @@
 [data-hf-page="profile"] .danger-zone {align-items:flex-start;flex-direction:column}
 [data-hf-page="profile"] .btn {padding:10px 13px}
 }
+
+/* Read-only state of a field, and the photo buttons beside the avatar.
+   Added 27-11-2026 with the Edit button: the design only ever drew inputs, so
+   it had no style for a value being *shown*. Deliberately the same box metrics
+   as `.field input` so nothing shifts when Edit is pressed — that is what
+   "unlock in place" has to look like. */
+[data-hf-page="profile"] .field .value {margin:0;padding:12px 1px;font-size:14px;font-weight:600;color:var(--ink);min-height:21px;word-break:break-word}
+[data-hf-page="profile"] .photo-actions {display:flex;flex-wrap:wrap;gap:9px}

@@ -1,53 +1,53 @@
 'use client';
 
-// The live half of Profile & settings (PDF §5.9) — the account shell, the
-// sidebar, and the personal-information form reading and writing
-// `/app/customer/profile` and `/app/customer/addresses`.
+// My Profile (PDF §5.9) — the whole page, now that it is one screen.
 //
-// The demo's values were hard-coded ("Aarohi Rao", "aarohi@example.com",
-// "Baner, Pune"); they come from the signed-in account now. The markup,
-// classes and ids are the design's.
+// Three things changed on the client's word, 27-11-2026:
 //
-// Three inputs the design offers that the API will not take, each marked
-// read-only rather than silently discarding what is typed into it:
+// 1. **The page's own five-tab sidebar is gone.** It replaced the account
+//    sidebar with a different menu, so the navigation changed under you
+//    depending on which row you arrived by. `AccountSidebar` is shared with
+//    every other signed-in page now.
+// 2. **Password & security, Preferences and Privacy & account are deleted.**
+//    They were design with no API behind them; `StaticSections.tsx` held all
+//    four and is deleted with them. Notifications, the fourth, moved up to
+//    the sidebar as a link to `/notifications` — the one notification screen
+//    that is actually wired.
+// 3. **The details are read-only until Edit is pressed**, and Edit unlocks
+//    them in place rather than opening a second screen.
 //
-// - **Mobile** — the login identity. Changing it means verifying a new
-//   number by OTP, which §3.1 does not ask for.
-// - **City** — `Address.cityId` is a foreign key and there is no public city
-//   list to pick from (only `/admin/masters/cities`). Shown as resolved.
-// - **Profile photo** — no avatar column and no upload route for customers.
+// Two fields the API will not take are marked read-only in both states rather
+// than silently discarding what is typed — see `ProfileFields`.
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { StaticSections } from './StaticSections';
+import { AccountSidebar } from '@/components/AccountSidebar';
+import { ProfileFields } from './ProfileFields';
+import { ProfilePhoto } from './ProfilePhoto';
 import { loadProfile, saveProfile } from '@/lib/profile';
 import type { ProfileForm } from '@/lib/profile';
 
-type Section = 'profile' | 'security' | 'notifications' | 'preferences' | 'privacy';
+const BLANK: ProfileForm = {
+  firstName: '', lastName: '', email: '', mobile: '', dob: '',
+  gender: 'UNDISCLOSED', about: '', line1: '', city: '', pincode: '',
+};
 
-const NAV: { id: Section; icon: string; label: string }[] = [
-  { id: 'profile', icon: '♙', label: 'Personal profile' },
-  { id: 'security', icon: '♢', label: 'Password & security' },
-  { id: 'notifications', icon: '♧', label: 'Notifications' },
-  { id: 'preferences', icon: '⚙', label: 'Preferences' },
-  { id: 'privacy', icon: '▣', label: 'Privacy & account' },
-];
-
-/** `Aarohi Rao` → `AR`. The avatar shows initials; there is no photo column. */
+/** `Aarohi Rao` → `AR`. Shown until there is a photo. */
 function initials(first: string, last: string): string {
-  const letters = `${first.trim()[0] ?? ''}${last.trim()[0] ?? ''}`.toUpperCase();
-  return letters || '—';
+  return `${first.trim()[0] ?? ''}${last.trim()[0] ?? ''}`.toUpperCase() || '—';
 }
 
 export function ProfileAccount() {
   const router = useRouter();
-  const [section, setSection] = useState<Section>('profile');
   const [form, setForm] = useState<ProfileForm | null>(null);
   const [loaded, setLoaded] = useState<ProfileForm | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState('Loading your details…');
   const [saved, setSaved] = useState(false);
+
+  const toLogin = useCallback(() => router.replace('/login'), [router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,7 +57,7 @@ export function ProfileAccount() {
       if (cancelled) return;
 
       if (result.unauthorised) {
-        router.replace('/login');
+        toLogin();
         return;
       }
 
@@ -68,6 +68,7 @@ export function ProfileAccount() {
 
       setForm(result.form);
       setLoaded(result.form);
+      setPhotoUrl(result.photoUrl ?? null);
       setAddressId(result.addressId ?? null);
       setStatus('All changes saved');
       setSaved(true);
@@ -76,7 +77,7 @@ export function ProfileAccount() {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [toLogin]);
 
   const set = useCallback(
     <K extends keyof ProfileForm>(key: K, value: ProfileForm[K]) => {
@@ -86,6 +87,14 @@ export function ProfileAccount() {
     },
     [],
   );
+
+  /** Back to the values the server last gave us, and out of edit mode. */
+  function cancel() {
+    if (loaded) setForm(loaded);
+    setEditing(false);
+    setStatus('All changes saved');
+    setSaved(true);
+  }
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -108,166 +117,80 @@ export function ProfileAccount() {
     if (fresh.form) {
       setForm(fresh.form);
       setLoaded(fresh.form);
+      setPhotoUrl(fresh.photoUrl ?? null);
       setAddressId(fresh.addressId ?? null);
     }
 
+    setEditing(false);
     setStatus('All changes saved');
     setSaved(true);
   }
 
-  const who = form ?? {
-    firstName: '',
-    lastName: '',
-    email: '',
-    mobile: '',
-    dob: '',
-    gender: 'UNDISCLOSED' as const,
-    about: '',
-    line1: '',
-    city: '',
-    pincode: '',
-  };
-
+  const who = form ?? BLANK;
   const avatar = initials(who.firstName, who.lastName);
-  const fullName = [who.firstName, who.lastName].filter(Boolean).join(' ') || 'Your account';
 
   return (
-    <>
-      {/* The demo's own topbar was removed here on 13 Nov: the shared Header
-          in the root layout carries the brand, the menu and the avatar on
-          every page now, and keeping this one gave /profile two headers.
-          smoke:web-shell counts them, which is how it was caught. */}
+    <div className="layout">
+      <div className="hf-account-shell">
+        <AccountSidebar current="/profile" />
 
-      <div className="layout">
-        <aside className="sidebar" id="sidebar">
-          <div className="user-mini">
-            <div className="user-pic" id="sideAvatar">{avatar}</div>
-            <div><strong id="sideName">{fullName}</strong><small>Customer account</small></div>
-          </div>
-          <div className="nav-label">MY ACCOUNT</div>
-          <Link className="nav-btn" href="/dashboard"><span className="ico">▦</span> Dashboard</Link>
-          {NAV.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`nav-btn${section === item.id ? ' active' : ''}`}
-              data-section={item.id}
-              onClick={() => setSection(item.id)}
-            >
-              <span className="ico">{item.icon}</span> {item.label}
-            </button>
-          ))}
-          <div className="sidebar-bottom">
-            <strong>Need a little help?</strong>
-            <p>Our support team is here if you need assistance with your account.</p>
-            <a className="text-link" href="mailto:support@hellofit.example">Contact support ↗</a>
-          </div>
-        </aside>
-
-        <main className="main">
+        <main className="main hf-account-main">
           <div className="welcome">
             <div>
               <div className="eyebrow">YOUR ACCOUNT</div>
-              <h1>Profile &amp; settings</h1>
+              <h1>My Profile</h1>
               <p>Keep your details up to date and make HelloFit work for you.</p>
             </div>
-            <button className="mobile-menu">☰ Menu</button>
             <div className="status">
               <span className={`dot${saved ? ' saved' : ''}`} id="saveDot"></span>
               <span id="saveStatus">{status}</span>
             </div>
           </div>
-
-          <section className={`section${section === 'profile' ? ' active' : ''}`} id="profile">
-            <div className="panel">
-              <div className="panel-head">
-                <div><h2>Personal information</h2><p>These details help your trainer and HelloFit reach you.</p></div>
-                <span className="tag">Customer profile</span>
+  
+          <div className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Personal information</h2>
+                <p>These details help your trainer and HelloFit reach you.</p>
               </div>
-              <form id="profileForm" onSubmit={onSubmit}>
-                <div className="panel-body">
-                  <div className="profile-strip">
-                    <div className="large-avatar" id="largeAvatar">{avatar}</div>
-                    <div>
-                      <strong>Profile photo</strong>
-                      <p>Your initials are shown while profile photos are not yet supported.</p>
-                    </div>
-                  </div>
-                  <div className="grid">
-                    <div className="field">
-                      <label htmlFor="firstName">First name *</label>
-                      <input id="firstName" required={true} autoComplete="given-name"
-                        value={who.firstName} onChange={(e) => set('firstName', e.target.value)} />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="lastName">Last name</label>
-                      <input id="lastName" autoComplete="family-name"
-                        value={who.lastName} onChange={(e) => set('lastName', e.target.value)} />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="email">Email address</label>
-                      <input id="email" type="email" autoComplete="email"
-                        value={who.email} onChange={(e) => set('email', e.target.value)} />
-                      <span className="hint">Used for booking confirmations and invoices.</span>
-                    </div>
-                    <div className="field">
-                      <label htmlFor="phone">Mobile number</label>
-                      <input id="phone" type="tel" readOnly={true} value={who.mobile} />
-                      <span className="hint">This is your sign-in number.</span>
-                    </div>
-                    <div className="field">
-                      <label htmlFor="dob">Date of birth</label>
-                      <input id="dob" type="date" value={who.dob} onChange={(e) => set('dob', e.target.value)} />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="gender">Gender (optional)</label>
-                      <select id="gender" value={who.gender}
-                        onChange={(e) => set('gender', e.target.value as ProfileForm['gender'])}>
-                        <option value="UNDISCLOSED">Prefer not to say</option>
-                        <option value="FEMALE">Female</option>
-                        <option value="MALE">Male</option>
-                        <option value="OTHER">Other</option>
-                      </select>
-                    </div>
-                    <div className="field full">
-                      <label htmlFor="address">Address</label>
-                      <input id="address" autoComplete="street-address"
-                        value={who.line1} onChange={(e) => set('line1', e.target.value)} />
-                      <span className="hint">Where your sessions take place.</span>
-                    </div>
-                    <div className="field">
-                      <label htmlFor="city">City</label>
-                      <input id="city" readOnly={true} value={who.city} placeholder="Set from your service area" />
-                    </div>
-                    <div className="field">
-                      <label htmlFor="pin">PIN code</label>
-                      <input id="pin" inputMode="numeric" maxLength={6} autoComplete="postal-code"
-                        value={who.pincode} onChange={(e) => set('pincode', e.target.value)} />
-                    </div>
-                    <div className="field full">
-                      <label htmlFor="about">A little about you (optional)</label>
-                      <textarea id="about" placeholder="Anything your trainer should know — injuries, conditions or preferences…"
-                        value={who.about} onChange={(e) => set('about', e.target.value)}></textarea>
-                      <span className="hint">Shared with the trainer before your session.</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="actions">
-                  <button type="button" className="btn" id="resetProfile"
-                    onClick={() => { if (loaded) { setForm(loaded); setStatus('All changes saved'); setSaved(true); } }}>
-                    Discard changes
-                  </button>
-                  <button type="submit" className="btn primary" disabled={!form}>Save profile changes</button>
-                </div>
-              </form>
+              {editing ? (
+                <span className="tag">Editing</span>
+              ) : (
+                <button type="button" className="btn primary" id="editProfile"
+                  disabled={!form} onClick={() => setEditing(true)}>
+                  Edit
+                </button>
+              )}
             </div>
-          </section>
-
-          <StaticSections active={section} />
-
+  
+            <form id="profileForm" onSubmit={onSubmit}>
+              <div className="panel-body">
+                <ProfilePhoto
+                  initials={avatar}
+                  photoUrl={photoUrl}
+                  editing={editing}
+                  onChanged={setPhotoUrl}
+                  onUnauthorised={toLogin}
+                />
+                <ProfileFields who={who} editing={editing} set={set} />
+              </div>
+  
+              {editing && (
+                <div className="actions">
+                  <button type="button" className="btn" id="cancelProfile" onClick={cancel}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn primary" disabled={!form}>
+                    Save changes
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+  
           <div className="footnote">HelloFit · Move better. Feel stronger. Live well.</div>
         </main>
       </div>
-    </>
+    </div>
   );
 }

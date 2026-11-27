@@ -1,17 +1,32 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import './page.css';
 import { LiveSections } from './LiveSections';
 import { DashboardNav } from './DashboardNav';
-import { LiveGoalCard, LiveGreeting, LiveStats, LiveUserMini } from './LiveIdentity';
-import { LiveBookingsPanel } from './LiveBookingsPanel';
-import { LiveProfileForm } from './LiveProfileForm';
+import { LiveGoalCard, LiveGreeting, LiveStats } from './LiveIdentity';
 import { BookSessionButton } from './BookSessionButton';
+import { AccountSidebar } from '@/components/AccountSidebar';
 import { RequireSignIn } from '@/components/RequireSignIn';
 
 /**
  * Converted from the demo's hellofit-customer-dashboard.html.
  * The markup and styling are the client's design; only the mechanics are React.
+ *
+ * **One panel, from 27-11-2026.** The demo built this page as six stacked
+ * `.page-panel` sections — Overview, My Bookings, Saved Trainers, Fitness
+ * Goals, My Profile, Settings — that its sidebar swapped between, while four
+ * of those five also existed as real routes with better versions of the same
+ * thing. So the sidebar's My Bookings showed a plainer list than the avatar
+ * dropdown's, and its My Profile a shorter form than `/profile`.
+ *
+ * The client had that collapsed: every row of the account sidebar is a link to
+ * a real page, this page keeps Overview alone, and the shared
+ * `AccountSidebar` replaces the copy that used to be written out here. The
+ * Settings panel went with them — its three notification switches saved
+ * nothing and duplicated `/notifications`, which is wired.
+ *
+ * Deleted in the same pass: `LiveBookingsPanel` (absorbed by
+ * `/my-bookings`), `LiveProfileForm` (by `/profile`) and `LiveUserMini` (the
+ * shared sidebar brings `AccountUserMini`).
  */
 
 export const metadata: Metadata = {
@@ -20,8 +35,54 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div data-hf-page="dashboard"><RequireSignIn /><DashboardNav />
-      <div className="layout"><aside className="sidebar" id="sidebar"><LiveUserMini /><div className="nav-label">YOUR SPACE</div><button className="nav-btn active" data-page="overview"><span className="ico">⌂</span> Overview</button><button className="nav-btn" data-page="bookings"><span className="ico">▦</span> My Bookings</button><button className="nav-btn" data-page="saved"><span className="ico">♡</span> Saved Trainers</button><button className="nav-btn" data-page="goals"><span className="ico">◎</span> Fitness Goals</button><div className="nav-label">ACCOUNT</div><button className="nav-btn" data-page="profile"><span className="ico">♙</span> My Profile</button><button className="nav-btn" data-page="settings"><span className="ico">⚙</span> Settings</button><Link className="nav-btn" href="/billing"><span className="ico">🧾</span> Billing History</Link><Link className="nav-btn" href="/refunds"><span className="ico">↩</span> Refunds</Link><div className="sidebar-bottom"><strong>Ready for your next session?</strong><p>Find a trainer who fits your goals and schedule.</p><button className="text-link" id="findTrainerSide">Explore trainers →</button></div></aside><main className="main"><div id="notice" className="notice"></div><section className="page-panel active" id="page-overview"><div className="welcome"><div><div className="eyebrow">YOUR WELLNESS JOURNEY</div><LiveGreeting /><p>Small steps today. Stronger you tomorrow.</p></div><BookSessionButton /></div><LiveStats /><div className="section"><div className="section-head"><div><h2>Your next session</h2><p>You&apos;re one session closer to your goals.</p></div><span className="status confirmed">● Confirmed</span></div><LiveSections /><div className="section"><div className="section-head"><div><h2>Your monthly goal</h2><p>Consistency is your superpower.</p></div><span style={{ fontSize: "22px" }}>🎯</span></div><LiveGoalCard /></div></div></section><section className="page-panel" id="page-bookings"><div className="welcome"><div><div className="eyebrow">YOUR SCHEDULE</div><h1>My Bookings</h1><p>All your sessions, in one place.</p></div><BookSessionButton id="bookFromBookings" /></div><LiveBookingsPanel /></section><section className="page-panel" id="page-saved"><div className="welcome"><div><div className="eyebrow">YOUR FAVOURITES</div><h1>Saved Trainers</h1><p>Trainers you want to come back to.</p></div><button className="primary" id="browseSaved">＋ Find trainers</button></div><div className="section"><div className="trainer-grid" id="savedTrainers"></div></div></section><section className="page-panel" id="page-goals"><div className="welcome"><div><div className="eyebrow">YOUR PROGRESS</div><h1>Fitness Goals</h1><p>Build a routine that works for you.</p></div></div><div className="section"><div className="section-head"><div><h2>November session goal</h2><p>Sessions you have completed on your account.</p></div><span className="status confirmed">In progress</span></div><LiveGoalCard /></div></section><section className="page-panel" id="page-profile"><div className="welcome"><div><div className="eyebrow">YOUR DETAILS</div><h1>My Profile</h1><p>Keep your contact details up to date.</p></div></div><div className="section"><div className="section-head"><div><h2>Personal information</h2><p>Manage your customer profile.</p></div></div><LiveProfileForm /></div></section><section className="page-panel" id="page-settings"><div className="welcome"><div><div className="eyebrow">PREFERENCES</div><h1>Settings</h1><p>Control your HelloFit experience.</p></div></div><div className="section"><div className="section-head"><div><h2>Notifications</h2><p>Choose which updates you receive.</p></div></div><label style={{ display: "flex", gap: "12px", alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--line)" }}><input type="checkbox" defaultChecked={true} /> <span><b>Booking reminders</b><br /><small style={{ color: "var(--muted)" }}>Get reminders before your sessions.</small></span></label><label style={{ display: "flex", gap: "12px", alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--line)" }}><input type="checkbox" defaultChecked={true} /> <span><b>Booking updates</b><br /><small style={{ color: "var(--muted)" }}>Changes to confirmations and schedules.</small></span></label><label style={{ display: "flex", gap: "12px", alignItems: "center", padding: "14px 0" }}><input type="checkbox" /> <span><b>Offers and wellness tips</b><br /><small style={{ color: "var(--muted)" }}>Occasional updates from HelloFit.</small></span></label><button className="primary" id="saveSettings" style={{ marginTop: "12px" }}>Save preferences</button></div></section></main></div><div className="modal-backdrop" id="modalBackdrop"><div className="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><h3 id="modalTitle">Booking details</h3><p id="modalText"></p><div id="modalFields"></div><div className="modal-actions"><button className="small-btn" id="modalClose">Close</button><button className="primary" id="modalConfirm">Confirm</button></div></div></div>
+    <div data-hf-page="dashboard">
+      <RequireSignIn />
+      <DashboardNav />
+
+      <div className="layout">
+        <div className="hf-account-shell">
+          <AccountSidebar current="/dashboard" />
+
+          <main className="main hf-account-main">
+            <div id="notice" className="notice"></div>
+
+            <div className="welcome">
+              <div>
+                <div className="eyebrow">YOUR WELLNESS JOURNEY</div>
+                <LiveGreeting />
+                <p>Small steps today. Stronger you tomorrow.</p>
+              </div>
+              <BookSessionButton />
+            </div>
+
+            <LiveStats />
+
+            <div className="section">
+              <div className="section-head">
+                <div>
+                  <h2>Your next session</h2>
+                  <p>You&apos;re one session closer to your goals.</p>
+                </div>
+                <span className="status confirmed">● Confirmed</span>
+              </div>
+              <LiveSections />
+
+              <div className="section">
+                <div className="section-head">
+                  <div>
+                    <h2>Your monthly goal</h2>
+                    <p>Consistency is your superpower.</p>
+                  </div>
+                  <span style={{ fontSize: "22px" }}>🎯</span>
+                </div>
+                <LiveGoalCard />
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <div className="modal-backdrop" id="modalBackdrop"><div className="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><h3 id="modalTitle">Booking details</h3><p id="modalText"></p><div id="modalFields"></div><div className="modal-actions"><button className="small-btn" id="modalClose">Close</button><button className="primary" id="modalConfirm">Confirm</button></div></div></div>
     </div>
   );
 }

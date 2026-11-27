@@ -1,26 +1,18 @@
 'use client';
 
-// The dashboard's sidebar navigation and mobile menu.
+// The dashboard's mobile menu toggle — all that is left of its navigation.
 //
-// These existed in the demo as inline JavaScript (`gotoPage()` plus a
-// `#menuToggle` listener) and were the one part of that page never converted —
-// so every sidebar button did nothing at all, and on mobile the menu would not
-// open. This restores exactly that behaviour and adds nothing: the markup,
-// the classes, the ids and the `data-page` attributes are all the client's.
+// This used to carry the demo's `gotoPage()` as well: six sidebar buttons
+// swapping six `.page-panel` sections inside this one page. The client had
+// that removed on 27-11-2026 — every account row is a link to a real route
+// now, and the dashboard keeps Overview alone — so there are no panels left to
+// switch and no `data-page` buttons to listen to.
 //
-// It works through the DOM rather than React state on purpose. The page is a
-// server component whose body is one large block of converted markup; lifting
-// six panels and six buttons into state would mean rewriting all of it, and
-// the design's own CSS already does the showing and hiding —
-// `.page-panel{display:none}` / `.page-panel.active{display:block}`. So the
-// only thing missing was the class toggle, which is what this does.
-//
-// The demo's `gotoPage()` also called `renderAllBookings()` and
-// `renderSaved()`, which filled two panels with its sample rows. Those are
-// deliberately NOT reproduced: the bookings panel duplicates `/my-bookings`,
-// which reads the live API, and saved trainers has no backend at all (a
-// favourites table appears nowhere in the v3 PDF). Inventing rows here would
-// put fake data back on a page we are trying to make real.
+// What remains is the one thing the demo shipped as inline JavaScript and that
+// still has a job: below 980px the sidebar is hidden and the shared header's ☰
+// opens it. `SidebarToggle` does that for the pages that render
+// `AccountSidebar` on its own; this page is wrapped in the dashboard's own
+// scope, so the `#menuToggle` inside it is handled here.
 
 import { useEffect } from 'react';
 
@@ -28,11 +20,10 @@ import { useEffect } from 'react';
  * Shipped-marker, and the only reason it is a named constant.
  *
  * This component renders `null`, so nothing it does appears in the server HTML
- * — which means a smoke test cannot tell a page that has the navigation from
- * one that does not. `smoke:web-dashboard` greps the page's JS bundle for this
- * exact string to prove the handler was actually built and deployed, and reads
- * the attribute below in a browser to prove it ran. Keep the literal in sync
- * with that suite.
+ * — which means a smoke test cannot tell a page that has the handler from one
+ * that does not. `smoke:web-dashboard` greps the page's JS bundle for this
+ * exact string to prove it was built and deployed, and reads the attribute
+ * below in a browser to prove it ran. Keep the literal in sync with that suite.
  */
 export const NAV_MARKER = 'hf-dashboard-nav-ready';
 
@@ -44,35 +35,13 @@ export function DashboardNav() {
     // Invisible to the design, visible to a test: proof the effect ran.
     (root as HTMLElement).dataset.hfNav = NAV_MARKER;
 
-    const panels = Array.from(root.querySelectorAll<HTMLElement>('.page-panel'));
-    const buttons = Array.from(root.querySelectorAll<HTMLElement>('.nav-btn'));
     const sidebar = root.querySelector<HTMLElement>('#sidebar');
     const menuToggle = root.querySelector<HTMLElement>('#menuToggle');
 
-    // The demo's gotoPage(), unchanged in behaviour.
-    const gotoPage = (page: string) => {
-      panels.forEach((p) => p.classList.toggle('active', p.id === `page-${page}`));
-      buttons.forEach((b) => b.classList.toggle('active', b.dataset.page === page));
-      sidebar?.classList.remove('open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const onNav = (event: Event) => {
-      const page = (event.currentTarget as HTMLElement).dataset.page;
-      if (page) gotoPage(page);
-    };
-
     const onToggle = () => sidebar?.classList.toggle('open');
-
-    buttons.forEach((b) => b.addEventListener('click', onNav));
     menuToggle?.addEventListener('click', onToggle);
 
-    // The sidebar's "Explore trainers" and the overview's booking buttons were
-    // separate demo handlers; they are left alone here so this component owns
-    // one thing only.
-
     return () => {
-      buttons.forEach((b) => b.removeEventListener('click', onNav));
       menuToggle?.removeEventListener('click', onToggle);
     };
   }, []);

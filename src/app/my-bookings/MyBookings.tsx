@@ -1,10 +1,25 @@
 'use client';
 
-// The live half of My Bookings: the four stat cards and the list.
+// The live half of My Bookings: the "All sessions" head, the four stat cards
+// and the list.
 //
 // The demo's stats were fixed strings (2, 8, ₹5,250, 1) with the caption
 // "Across your sample bookings". They are counted from the real bookings
 // now; the markup, classes and ids are the demo's.
+//
+// **One page, one list, from 27-11-2026.** Until then there were two My
+// Bookings: this route, and a panel inside the dashboard headed "All sessions"
+// that the sidebar's row opened instead — a plainer list of the same bookings,
+// with no stats and no search. The client had them merged into this one, which
+// now carries the sidebar so it never opens on its own. The dashboard panel
+// and `LiveBookingsPanel` are deleted.
+//
+// The "All sessions" head came across with it. Its status filter did **not**:
+// `BookingList` already filters by status, with four states, live counts,
+// search and sort, so a second control would have been two things fighting
+// over one list. Note for the client: that filter therefore sits with the list
+// it filters, below the tiles rather than above them — a filter drawn above
+// the tiles reads as filtering the tiles, and the tiles are totals.
 //
 // A signed-out visitor is sent to /login rather than shown an empty page —
 // every route here needs a token.
@@ -56,6 +71,11 @@ export function MyBookings() {
 
   return (
     <>
+      <div className="section-head">
+        <h2>All sessions</h2>
+        <p>Every session on your account.</p>
+      </div>
+
       <section className="stats">
         <div className="stat">
           <div className="stat-top">

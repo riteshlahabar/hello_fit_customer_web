@@ -28,6 +28,8 @@ export interface ApiProfile {
   dob: string | null;
   goal: string | null;
   healthNotes: string | null;
+  /** Permanent public URL, or null when the customer has no photo. */
+  photoUrl: string | null;
   referralCode: string;
   isComplete: boolean;
   user: { mobile: string; email: string | null };
@@ -63,6 +65,8 @@ export interface ProfileForm {
 
 export interface ProfileLoad {
   form?: ProfileForm;
+  /** Not part of the form: it is saved by its own route, not by Save. */
+  photoUrl?: string | null;
   /** Kept so a save can PATCH the right address rather than create a second. */
   addressId?: string | null;
   referralCode?: string;
@@ -111,6 +115,7 @@ export async function loadProfile(): Promise<ProfileLoad> {
 
   return {
     referralCode: profile.data.referralCode,
+    photoUrl: profile.data.photoUrl ?? null,
     addressId: home?.id ?? null,
     form: {
       firstName,

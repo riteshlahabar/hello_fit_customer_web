@@ -5,6 +5,7 @@ import './page.css';
 import { NoticeList } from './NoticeList';
 import { ChannelPrefs } from './ChannelPrefs';
 import { UpcomingCard } from './UpcomingCard';
+import { AccountSidebar } from '@/components/AccountSidebar';
 
 /**
  * Converted from the demo's hellofit-notifications-reminders.html.
@@ -25,7 +26,7 @@ export default function NotificationsPage() {
       
       
 
-      <main className="container">
+      <main className="container"><div className="hf-account-shell"><AccountSidebar current="/notifications" /><div className="hf-account-main">
         <div className="breadcrumb">Home / Customer Area / <b>Notifications &amp; Reminders</b></div>
         <section className="hero">
           <div>
@@ -44,7 +45,7 @@ export default function NotificationsPage() {
             <section className="card"><div className="card-head"><div><h2>Quick links</h2><div className="sub">Manage your HelloFit account</div></div></div><div className="settings-section"><div className="setting-row"><div className="setting-left"><div className="setting-ico">▤</div><div><div className="setting-title">My bookings</div><div className="setting-desc">View, reschedule or cancel sessions</div></div></div><Link href="/my-bookings" style={{ color: "var(--orange)", textDecoration: "none", fontWeight: "700" }}>→</Link></div><div className="setting-row"><div className="setting-left"><div className="setting-ico">☏</div><div><div className="setting-title">Help &amp; support</div><div className="setting-desc">Get help with your account</div></div></div><Link href="/help" style={{ color: "var(--orange)", textDecoration: "none", fontWeight: "700" }}>→</Link></div><div className="setting-row"><div className="setting-left"><div className="setting-ico">⚙</div><div><div className="setting-title">Account settings</div><div className="setting-desc">Update your profile preferences</div></div></div><Link href="/profile" style={{ color: "var(--orange)", textDecoration: "none", fontWeight: "700" }}>→</Link></div></div></section>
           </aside>
         </div>
-      </main>
+      </div></div></main>
 
       
       <div className="toast" id="toast" role="status" aria-live="polite"></div>

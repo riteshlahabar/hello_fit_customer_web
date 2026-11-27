@@ -109,3 +109,10 @@
 [data-hf-page="my-bookings"] .booking-side {grid-template-columns:1fr}
 [data-hf-page="my-bookings"] .booking-side .price-wrap {grid-column:auto}
 }
+
+/* "All sessions", carried over from the dashboard panel this page absorbed on
+   27-11-2026. The dashboard's own `.section-head` lived in its stylesheet, so
+   the two lines get their own rules here rather than a cross-page import. */
+[data-hf-page="my-bookings"] .section-head {margin-bottom:18px}
+[data-hf-page="my-bookings"] .section-head h2 {font-size:17px;letter-spacing:-.3px;margin:0 0 4px}
+[data-hf-page="my-bookings"] .section-head p {font-size:12px;color:var(--muted);margin:0}

@@ -115,3 +115,16 @@ export function dateParts(iso: string) {
     long: `${when.toLocaleDateString('en-IN', { weekday: 'short' }).toUpperCase()}, ${day}-${month}-${y}`,
   };
 }
+
+/**
+ * `2026-11-21` → `21-11-2026`. Rule 4, with no weekday attached.
+ *
+ * `dateParts().long` already prints the rule's order, but it leads with the
+ * weekday because every caller so far was a session date, where the day of
+ * the week is the useful part. A date of birth is not that, so it gets the
+ * bare form rather than "SAT, 21-11-2026".
+ */
+export function ddMmYyyy(iso: string): string {
+  const [y, m, d] = iso.split('-');
+  return y && m && d ? `${d}-${m}-${y}` : '';
+}

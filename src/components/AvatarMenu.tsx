@@ -56,13 +56,22 @@ const DIVIDER: React.CSSProperties = {
   margin: '5px 8px',
 };
 
-/** Where a signed-in customer needs to get to from any page. */
+/**
+ * Where a signed-in customer needs to get to from any page.
+ *
+ * Every row here leads to the same page the account sidebar's row of that name
+ * leads to — the client's point on 27-11-2026 was that the two menus must not
+ * disagree. "Profile & Settings" became "My Profile" in the same pass: the
+ * settings it named were three dead panels, now deleted, and what is left is
+ * the profile.
+ */
 const ACCOUNT_LINKS: string[][] = [
-  ['/dashboard', 'My Dashboard'],
+  ['/dashboard', 'Dashboard'],
   ['/my-bookings', 'My Bookings'],
+  ['/profile', 'My Profile'],
+  ['/notifications', 'Notifications'],
   ['/billing', 'Billing History'],
   ['/refunds', 'Refunds'],
-  ['/profile', 'Profile & Settings'],
 ];
 
 export function AvatarMenu() {

@@ -57,20 +57,6 @@ export function LiveGreeting() {
   );
 }
 
-export function LiveUserMini() {
-  const { name, initials } = useIdentity();
-  return (
-    <div className="user-mini">
-      <div className="user-pic">{initials}</div>
-      <div>
-        <strong>{name}</strong>
-        {/* No createdAt on the profile, so the date is unknown, not invented. */}
-        <small>Member since {UNKNOWN}</small>
-      </div>
-    </div>
-  );
-}
-
 /**
  * The monthly-goal card, with the one true number in it and nothing else.
  *

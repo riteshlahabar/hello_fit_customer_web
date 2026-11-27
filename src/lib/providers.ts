@@ -135,9 +135,13 @@ export async function searchProviders(
  * bookable is worse than showing none, so a failed call renders no band.
  */
 export async function topProviders(limit = 3): Promise<ProviderCard[]> {
+  // Live, not cached (client, 27-11-2026: "after admin approve show immediately
+  // trainer on page"). A 5-minute window meant a trainer ops had just approved
+  // was still missing from the homepage, which reads as the approval not having
+  // worked — the same complaint the publish-on-approval fix answers.
   const result = await apiGetResult<ProviderCard[]>(
     `/providers?sort=rating&limit=${limit}`,
-    { revalidate: 300 },
+    { revalidate: 0 },
   );
 
   return result.ok ? (result.data ?? []) : [];
